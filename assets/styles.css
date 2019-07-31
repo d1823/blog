@@ -1,0 +1,68 @@
+:root {
+	--color-background: #fdfdfd;
+	--color-foreground: #333;
+	--color-href: dodgerblue;
+	--color-pre-background: #ddd;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-background: #333333;
+		--color-foreground: #fdfdfd;
+		--color-href: tomato;
+		--color-pre-background: #111;
+	}
+
+	p {
+		line-height: 1.5;
+		word-spacing: .05em;
+	}
+}
+
+body {
+	padding: 1rem 3rem;
+	background: var(--color-background);
+	color: var(--color-foreground);
+}
+
+pre, code {
+    white-space: pre-line;
+	background: var(--color-pre-background);
+}
+
+pre {
+	padding: 1rem;
+}
+
+a {
+	text-decoration: none;
+	color: var(--color-href);
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+body > header {
+	margin-bottom: 2rem;
+}
+
+article + article {
+	margin-top: 4rem;
+}
+
+article header {
+	padding-bottom: 1rem;
+}
+
+article > header > * {
+	display: inline-block;
+}
+
+article header h2 {
+	margin: 0;
+}
+
+article section {
+	margin: -1rem 0;
+}

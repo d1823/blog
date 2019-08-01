@@ -26,12 +26,15 @@ body {
 }
 
 pre, code {
-    white-space: pre-line;
 	background: var(--color-pre-background);
 }
 
 pre {
 	padding: 1rem;
+}
+
+pre > code {
+	font-size: .8rem;
 }
 
 a {

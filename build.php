@@ -7,7 +7,7 @@ $articles_dir = __DIR__ . "/articles";
 
 $page_title = "1823's programming ramblings";
 $page_description = "1823's programming ramblings";
-$page_url = "https://d1823.github.io/blog";
+$page_url = "https://d1823.github.io/blog/";
 
 $assets = array_map(function (string $asset_pathname): string {
     return sprintf("assets/%s", pathinfo($asset_pathname, PATHINFO_BASENAME));

@@ -9,9 +9,9 @@
 	<base href="<?= $page_url ?>" target="_blank">
 	<meta name="color-scheme" content="dark light">
 
-	<?php foreach($assets as $asset): ?>
-		<link rel="stylesheet" href="<?= $asset ?>">
-	<?php endforeach; ?>
+    <style>
+        <?= $styles ?>
+    </style>
 
 	<link rel="alternate" type="application/rss+xml" href="<?= $feed ?>" title="<?= $page_title ?>">
 </head>

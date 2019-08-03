@@ -7,7 +7,7 @@ $articles_dir = __DIR__ . "/articles";
 
 $page_title = "1823's programming ramblings";
 $page_description = "1823's programming ramblings";
-$page_url = "https://d1823.github.io/blog/";
+$page_url = "https://1823.pl/";
 
 $styles = array_reduce(files_from_dir("$src_dir/assets"), function (string $styles, string $asset_pathname): string {
     return $styles . file_get_contents($asset_pathname);

@@ -31,8 +31,9 @@ $articles = array_map(function (string $pathname) use ($page_url): stdClass {
     return (object) compact('id', 'title', 'description', 'time', 'human_time', 'content', 'url');
 }, files_from_dir($articles_dir, "md"));
 
-system("rm -fr $build_dir");
-system("mkdir $build_dir");
+system("mkdir -p $build_dir");
+system("rm -f $build_dir/index.html");
+system("rm -f $build_dir/feed.xml");
 
 file_put_contents(
 	"$build_dir/index.html",

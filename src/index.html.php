@@ -22,6 +22,14 @@
 		<hr>
 	</header>
 
+    <?php if (empty($articles)): ?>
+        <article>
+            <section>
+                No articles available yet.
+            </section>
+        </article>
+    <?php endif; ?>
+
 	<?php foreach($articles as $article): ?>
 		<article id="<?= $article->id ?>">
 			<header>

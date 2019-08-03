@@ -20,7 +20,7 @@ $articles = array_map(function (string $pathname) use ($page_url): stdClass {
 
     $title = parse_title($pathname);
     $description = parse_description($pathname);
-    $content = shell_exec("/usr/bin/pandoc -f markdown -t html $pathname 2> /dev/null");
+    $content = shell_exec("pandoc -f markdown -t html $pathname 2> /dev/null");
 
     $date = parse_date($pathname);
     $time = $date->format('Y-m-d');
@@ -29,7 +29,7 @@ $articles = array_map(function (string $pathname) use ($page_url): stdClass {
     $url = "$page_url#$id";
 
     return (object) compact('id', 'title', 'description', 'time', 'human_time', 'content', 'url');
-}, files_from_dir($articles_dir));
+}, files_from_dir($articles_dir, "md"));
 
 system("rm -fr $build_dir");
 system("mkdir $build_dir");
@@ -44,12 +44,16 @@ file_put_contents(
     render_to_string("$src_dir/feed.xml.php", compact('page_title', 'page_description', 'page_url', 'articles'))
 );
 
-function files_from_dir(string $path): array {
+function files_from_dir(string $path, string $extension = null): array {
     $files = new FilesystemIterator($path);
+
+    $files = array_filter(iterator_to_array($files), function (\SplFileInfo $file) use ($extension) {
+        return $extension === null || $extension === strtolower($file->getExtension());
+    });
 
     return array_map(function (\SplFileInfo $file) {
         return $file->getPathname();
-    }, iterator_to_array($files));
+    }, $files);
 }
 
 function render_to_string(string $template_path, array $content): string {

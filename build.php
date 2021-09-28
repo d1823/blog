@@ -52,9 +52,13 @@ function files_from_dir(string $path, string $extension = null): array {
         return $extension === null || $extension === strtolower($file->getExtension());
     });
 
-    return array_map(function (\SplFileInfo $file) {
+    $paths = array_map(function (\SplFileInfo $file) {
         return $file->getPathname();
     }, $files);
+
+    sort($paths);
+
+    return $paths;
 }
 
 function render_to_string(string $template_path, array $content): string {

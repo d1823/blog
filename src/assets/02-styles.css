@@ -12,17 +12,21 @@
 		--color-href: tomato;
 		--color-pre-background: #111;
 	}
-
-	p {
-		line-height: 1.5;
-		word-spacing: .05em;
-	}
 }
+
 
 body {
 	padding: 1rem 3rem;
 	background: var(--color-background);
 	color: var(--color-foreground);
+  font-family: sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  word-spacing: .05em;
+}
+
+p > code {
+  padding: 0 .3rem;
 }
 
 pre, code {
@@ -31,10 +35,6 @@ pre, code {
 
 pre {
 	padding: 1rem;
-}
-
-pre > code {
-	font-size: .8rem;
 }
 
 a {

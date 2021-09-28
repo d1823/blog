@@ -32,8 +32,12 @@ $articles = array_map(function (string $pathname) use ($page_url): stdClass {
 
     $url = "$page_url#$id";
 
-    return (object) compact('id', 'title', 'description', 'time', 'human_time', 'content', 'url');
+    return (object) compact('id', 'title', 'description', 'date', 'time', 'human_time', 'content', 'url');
 }, files_from_dir($articles_dir, "md"));
+
+usort($articles, function (object $article, object $other_article) {
+    return $other_article->date->getTimestamp() <=> $article->date->getTimestamp();
+});
 
 system("mkdir -p $build_dir");
 system("rm -f $build_dir/index.html");

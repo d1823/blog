@@ -37,7 +37,7 @@
 					<h2><?= $article->title ?></h2>
 				</a>
 
-				<small>on <time datetime="<?= $article->time ?>"><?= $article->human_time ?></time></small>
+				<small>from <time datetime="<?= $article->time ?>"><?= $article->human_time ?></time></small>
 			</header>
 
 			<section>

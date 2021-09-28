@@ -44,7 +44,7 @@ system("rm -f $build_dir/index.html");
 system("rm -f $build_dir/feed.xml");
 
 file_put_contents(
-	"$build_dir/index.html",
+    "$build_dir/index.html",
     render_to_string("$src_dir/index.html.php", compact('page_title', 'page_description', 'page_url', 'styles', 'feed', 'articles'))
 );
 
@@ -70,21 +70,21 @@ function files_from_dir(string $path, string $extension = null): array {
 }
 
 function render_to_string(string $template_path, array $content): string {
-	extract($content);
+    extract($content);
 
-	ob_start();
-	include $template_path;
-	return ob_get_clean();
+    ob_start();
+    include $template_path;
+    return ob_get_clean();
 }
 
 function parse_title(string $pathname) {
-	$title = parse_token("TITLE", $pathname);
+    $title = parse_token("TITLE", $pathname);
 
-	if (!$title) {
-		throw new \RuntimeException("$pathname: missing a title");
-	}
+    if (!$title) {
+        throw new \RuntimeException("$pathname: missing a title");
+    }
 
-	return $title;
+    return $title;
 }
 
 function parse_description(string $pathname) {
@@ -98,36 +98,36 @@ function parse_description(string $pathname) {
 }
 
 function parse_date(string $pathname): \DateTime {
-	$date_format = 'Y-m-d';
-	$date_string = parse_token("DATE", $pathname);
+    $date_format = 'Y-m-d';
+    $date_string = parse_token("DATE", $pathname);
 
     $date = DateTime::createFromFormat(
-    	$date_format,
-    	$date_string
-	);
+        $date_format,
+        $date_string
+    );
 
     $errors = DateTime::getLastErrors();
 
     if (!empty($errors['warning_count']) || $date === false) {
-		throw new \RuntimeException("$pathname: date $date_string isn't formatted as $date_format");
+        throw new \RuntimeException("$pathname: date $date_string isn't formatted as $date_format");
     }
 
     return $date;
 }
 
 function parse_token(string $marker, string $pathname) {
-	$token = "[//]: # ($marker:";
-	$file_handle = fopen($pathname, 'r+');
+    $token = "[//]: # ($marker:";
+    $file_handle = fopen($pathname, 'r+');
 
-	while($line = fgets($file_handle)){
-		if (strpos($line, $token) === false) {
-			continue;
-		}
+    while($line = fgets($file_handle)){
+        if (strpos($line, $token) === false) {
+            continue;
+        }
 
-		fclose($file_handle);
+        fclose($file_handle);
 
-		return trim(substr($line, strlen($token), -2));
-	}
+        return trim(substr($line, strlen($token), -2));
+    }
 
-	throw new \RuntimeException("$pathname: missing a $marker");
+    throw new \RuntimeException("$pathname: missing a $marker");
 }

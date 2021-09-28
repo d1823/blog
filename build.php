@@ -22,6 +22,10 @@ $articles = array_map(function (string $pathname) use ($page_url): stdClass {
     $description = parse_description($pathname);
     $content = shell_exec("pandoc -f markdown -t html $pathname 2> /dev/null");
 
+    if (!$content) {
+        throw new \RuntimeException("Converting markdown to html has failed. Make sure pandoc is installed.");
+    }
+
     $date = parse_date($pathname);
     $time = $date->format('Y-m-d');
     $human_time = $date->format('F d, Y');

@@ -5,8 +5,8 @@ $build_dir = __DIR__ . "/docs";
 $src_dir = __DIR__ . "/src";
 $articles_dir = __DIR__ . "/articles";
 
-$page_title = "1823's programming ramblings";
-$page_description = "1823's programming ramblings";
+$page_title = "d1823's programming ramblings";
+$page_description = "d1823's programming ramblings";
 $page_url = "https://1823.pl/";
 
 $styles = array_reduce(files_from_dir("$src_dir/assets"), function (string $styles, string $asset_pathname): string {

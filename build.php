@@ -15,7 +15,9 @@ $styles = array_reduce(files_from_dir("$src_dir/assets"), function (string $styl
 
 $feed = "feed.xml";
 
-$articles = array_map(function (string $pathname) use ($page_url): stdClass {
+$articles_images = files_from_dir($articles_dir, "png");
+
+$articles = array_map(function (string $pathname) use ($articles_dir, $articles_images, $build_dir, $page_url): stdClass {
     $id = pathinfo($pathname, PATHINFO_FILENAME);
 
     $title = parse_title($pathname);
@@ -24,6 +26,19 @@ $articles = array_map(function (string $pathname) use ($page_url): stdClass {
 
     if (!$content) {
         throw new \RuntimeException("Converting markdown to html has failed. Make sure pandoc is installed.");
+    }
+
+    foreach ($articles_images as $image_pathname) {
+        if (!stristr($image_pathname, $id)) {
+            continue;
+        }
+
+        $image_id = pathinfo($image_pathname, PATHINFO_FILENAME);
+        $image_basename = pathinfo($image_pathname, PATHINFO_BASENAME);
+
+        $content = str_ireplace($image_id, "$page_url$image_basename", $content);
+
+        copy($image_pathname, "$build_dir/$image_basename");
     }
 
     $date = parse_date($pathname);

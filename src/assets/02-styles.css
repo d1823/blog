@@ -3,6 +3,7 @@
   --color-foreground: #333;
   --color-href: dodgerblue;
   --color-pre-background: #ddd;
+  --color-muted: #777;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -11,9 +12,9 @@
     --color-foreground: #fdfdfd;
     --color-href: tomato;
     --color-pre-background: #111;
+    --color-muted: #aaa;
   }
 }
-
 
 body {
   padding: 1rem 3rem;
@@ -30,6 +31,7 @@ p > code {
 }
 
 pre, code {
+  color: var(--color-muted);
   background: var(--color-pre-background);
 }
 
@@ -68,4 +70,27 @@ article header h2 {
 
 article section {
   margin: -1rem 0;
+}
+
+article figure {
+  background: var(--color-pre-background);
+  padding: 0;
+  margin: 0;
+}
+
+article figure {
+  padding: 1rem;
+  display: block;
+}
+
+article figure img {
+  display: block;
+  margin: 0 auto;
+}
+
+article figure figcaption {
+  padding-top: 1rem;
+  font-size: .9rem;
+  text-align: center;
+  color: var(--color-muted);
 }

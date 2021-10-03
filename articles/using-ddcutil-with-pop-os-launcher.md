@@ -1,8 +1,8 @@
-[//]: # (TITLE: Hooking ddcutil with Pop!_OS applications launcher)
-[//]: # (DESCRIPTION: Hooking ddcutil with Pop!_OS applications launcher)
+[//]: # (TITLE: Using ddcutil with Pop!_OS Applications Launcher)
+[//]: # (DESCRIPTION: Using Pop!_OS Applications Launcher to control the brightness of my screen)
 [//]: # (DATE: 2021-10-03)
 
-In the article [Controlling my screen using MCCS](https://1823.pl/#using-mccs-to-control-brightess-of-my-screen) I've shown how to use ddcutil to change both contrast and brightness of your monitor without touching its physical controls. Here, I want to show you how I got it hooked with Pop!_OS (or any DE, really) application launcher for ease of use.
+In the article [Controlling my screen using MCCS](#controlling-my-screen-using-mccs) I've shown how to use ddcutil to change both contrast and brightness of your monitor without touching its physical controls. Here, I want to show you how I got it hooked with Pop!_OS (or any DE, really) application launcher for ease of use.
 
 
 Most Desktop Environments allow the user to quickly launch an application by showing a launcher. Whether it's something similiar to macOS's Spotlight, or Windows's Menu Start, it will allow you to launch a new application with just a few keystrokes.
@@ -133,5 +133,5 @@ StartupNotify=false
 
 With all of that done, I was now able to control the brightness and contrast of my monitor just as simply as launching an application.
 
-![Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM](hooking-ddcutil-with-pop-os-launcher--launcher)
+![Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM](using-ddcutil-with-pop-os-launcher--launcher)
 

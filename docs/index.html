@@ -612,17 +612,17 @@ code span.wa {
     </header>
 
     
-            <article id="hooking-ddcutil-with-pop-os-launcher">
+            <article id="using-ddcutil-with-pop-os-launcher">
             <header>
-                <a href="#hooking-ddcutil-with-pop-os-launcher">
-                    <h2>Hooking ddcutil with Pop!_OS applications launcher</h2>
+                <a href="#using-ddcutil-with-pop-os-launcher">
+                    <h2>Using ddcutil with Pop!_OS Applications Launcher</h2>
                 </a>
 
                 <small>from <time datetime="2021-10-03">October 03, 2021</time></small>
             </header>
 
             <section>
-                <p>In the article <a href="https://1823.pl/#using-mccs-to-control-brightess-of-my-screen">Controlling my screen using MCCS</a> I’ve shown how to use ddcutil to change both contrast and brightness of your monitor without touching its physical controls. Here, I want to show you how I got it hooked with Pop!_OS (or any DE, really) application launcher for ease of use.</p>
+                <p>In the article <a href="#controlling-my-screen-using-mccs">Controlling my screen using MCCS</a> I’ve shown how to use ddcutil to change both contrast and brightness of your monitor without touching its physical controls. Here, I want to show you how I got it hooked with Pop!_OS (or any DE, really) application launcher for ease of use.</p>
 <p>Most Desktop Environments allow the user to quickly launch an application by showing a launcher. Whether it’s something similiar to macOS’s Spotlight, or Windows’s Menu Start, it will allow you to launch a new application with just a few keystrokes.</p>
 <p>On Linux, as many of you probably already know, the entries showed by that launcher are stored in one of the directories listed in <code>$XDG_DATA_DIRS</code> as defined by the <a href="https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html">XDG Desktop Entry specification</a>. Each of these directories contain files with <code>.desktop</code> extension. If you’d open one of these files, you’d find the content is something like this:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode ini"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">[Desktop Entry]</span></span>
@@ -736,13 +736,13 @@ code span.wa {
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="dt">StartupNotify</span><span class="ot">=</span><span class="kw">false</span></span></code></pre></div>
 <p>With all of that done, I was now able to control the brightness and contrast of my monitor just as simply as launching an application.</p>
 <figure>
-<img src="https://1823.pl/hooking-ddcutil-with-pop-os-launcher--launcher.png" alt="" /><figcaption>Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM</figcaption>
+<img src="https://1823.pl/using-ddcutil-with-pop-os-launcher--launcher.png" alt="" /><figcaption>Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM</figcaption>
 </figure>
             </section>
         </article>
-            <article id="using-mccs-to-control-brightess-of-my-screen">
+            <article id="controlling-my-screen-using-mccs">
             <header>
-                <a href="#using-mccs-to-control-brightess-of-my-screen">
+                <a href="#controlling-my-screen-using-mccs">
                     <h2>Controlling my screen using MCCS</h2>
                 </a>
 

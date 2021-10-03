@@ -6,14 +6,14 @@
         <description>d1823's programming ramblings</description>
 
                    <item>
-               <title>Hooking ddcutil with Pop!_OS applications launcher</title>
-               <description>Hooking ddcutil with Pop!_OS applications launcher</description>
-               <link>https://1823.pl/#hooking-ddcutil-with-pop-os-launcher</link>
+               <title>Using ddcutil with Pop!_OS Applications Launcher</title>
+               <description>Using Pop!_OS Applications Launcher to control the brightness of my screen</description>
+               <link>https://1823.pl/#using-ddcutil-with-pop-os-launcher</link>
            </item>
                   <item>
                <title>Controlling my screen using MCCS</title>
                <description>Leveraging MCCS to control the brightness of my screen</description>
-               <link>https://1823.pl/#using-mccs-to-control-brightess-of-my-screen</link>
+               <link>https://1823.pl/#controlling-my-screen-using-mccs</link>
            </item>
           </channel>
 </rss>

@@ -1,19 +1,19 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<title>1823's programming ramblings</title>
-	<meta name="description" content="1823's programming ramblings">
-	<base href="https://1823.pl/" target="_blank">
-	<meta name="color-scheme" content="dark light">
+    <title>d1823's programming ramblings</title>
+    <meta name="description" content="d1823's programming ramblings">
+    <base href="https://1823.pl/" target="_blank">
+    <meta name="color-scheme" content="dark light">
 
     <style>
         /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
 
 /* Document
-   ========================================================================== */
+========================================================================== */
 
 /**
  * 1. Correct the line height in all browsers.
@@ -26,7 +26,7 @@ html {
 }
 
 /* Sections
-   ========================================================================== */
+========================================================================== */
 
 /**
  * Remove the margin in all browsers.
@@ -55,7 +55,7 @@ h1 {
 }
 
 /* Grouping content
-   ========================================================================== */
+========================================================================== */
 
 /**
  * 1. Add the correct box sizing in Firefox.
@@ -79,7 +79,7 @@ pre {
 }
 
 /* Text-level semantics
-   ========================================================================== */
+========================================================================== */
 
 /**
  * Remove the gray background on active links in IE 10.
@@ -151,7 +151,7 @@ sup {
 }
 
 /* Embedded content
-   ========================================================================== */
+========================================================================== */
 
 /**
  * Remove the border on images inside links in IE 10.
@@ -162,7 +162,7 @@ img {
 }
 
 /* Forms
-   ========================================================================== */
+========================================================================== */
 
 /**
  * 1. Change the font styles in all browsers.
@@ -323,7 +323,7 @@ textarea {
 }
 
 /* Interactive
-   ========================================================================== */
+========================================================================== */
 
 /*
  * Add the correct display in Edge, IE 10+, and Firefox.
@@ -342,7 +342,7 @@ summary {
 }
 
 /* Misc
-   ========================================================================== */
+========================================================================== */
 
 /**
  * Add the correct display in IE 10+.
@@ -361,135 +361,415 @@ template {
 }
 
 :root {
-	--color-background: #fdfdfd;
-	--color-foreground: #333;
-	--color-href: dodgerblue;
-	--color-pre-background: #ddd;
+  --color-background: #fdfdfd;
+  --color-foreground: #333;
+  --color-href: dodgerblue;
+  --color-pre-background: #ddd;
+  --color-muted: #777;
 }
 
 @media (prefers-color-scheme: dark) {
-	:root {
-		--color-background: #333333;
-		--color-foreground: #fdfdfd;
-		--color-href: tomato;
-		--color-pre-background: #111;
-	}
-
-	p {
-		line-height: 1.5;
-		word-spacing: .05em;
-	}
+  :root {
+    --color-background: #333333;
+    --color-foreground: #fdfdfd;
+    --color-href: tomato;
+    --color-pre-background: #111;
+    --color-muted: #aaa;
+  }
 }
 
 body {
-	padding: 1rem 3rem;
-	background: var(--color-background);
-	color: var(--color-foreground);
+  padding: 1rem 3rem;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  word-spacing: .05em;
+}
+
+p > code {
+  padding: 0 .3rem;
 }
 
 pre, code {
-	background: var(--color-pre-background);
+  color: var(--color-muted);
+  background: var(--color-pre-background);
 }
 
 pre {
-	padding: 1rem;
-}
-
-pre > code {
-	font-size: .8rem;
+  padding: 1rem;
 }
 
 a {
-	text-decoration: none;
-	color: var(--color-href);
+  text-decoration: none;
+  color: var(--color-href);
 }
 
 a:hover {
-	text-decoration: underline;
+  text-decoration: underline;
 }
 
 body > header {
-	margin-bottom: 2rem;
+  margin-bottom: 2rem;
 }
 
 article + article {
-	margin-top: 4rem;
+  margin-top: 4rem;
 }
 
 article header {
-	padding-bottom: 1rem;
+  padding-bottom: 1rem;
 }
 
 article > header > * {
-	display: inline-block;
+  display: inline-block;
 }
 
 article header h2 {
-	margin: 0;
+  margin: 0;
 }
 
 article section {
-	margin: -1rem 0;
+  margin: -1rem 0;
 }
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
+
+article figure {
+  background: var(--color-pre-background);
+  padding: 0;
+  margin: 0;
+}
+
+article figure {
+  padding: 1rem;
+  display: block;
+}
+
+article figure img {
+  display: block;
+  margin: 0 auto;
+}
+
+article figure figcaption {
+  padding-top: 1rem;
+  font-size: .9rem;
+  text-align: center;
+  color: var(--color-muted);
+}
+a.sourceLine {
+  display: inline-block;
+  line-height: 1.25;
+}
+
+a.sourceLine {
+  pointer-events: none;
+  color: inherit;
+  text-decoration: inherit;
+}
+
+a.sourceLine:empty {
+  height: 1.2em;
+}
+
+.sourceCode {
+  overflow: visible;
+}
+
+code.sourceCode {
+  white-space: pre;
+  position: relative;
+}
+
+div.sourceCode {
+  margin: 1em 0;
+}
+
+pre.sourceCode {
+  margin: 0;
+}
+
 @media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
-}
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
+  div.sourceCode {
+    overflow: auto;
   }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {  }
-@media screen {
-a.sourceLine::before { text-decoration: underline; }
 }
-code span.al { font-weight: bold; } /* Alert */
-code span.an { font-style: italic; } /* Annotation */
-code span.cf { font-weight: bold; } /* ControlFlow */
-code span.co { font-style: italic; } /* Comment */
-code span.cv { font-style: italic; } /* CommentVar */
-code span.do { font-style: italic; } /* Documentation */
-code span.dt { text-decoration: underline; } /* DataType */
-code span.er { font-weight: bold; } /* Error */
-code span.in { font-style: italic; } /* Information */
-code span.kw { font-weight: bold; } /* Keyword */
-code span.pp { font-weight: bold; } /* Preprocessor */
-code span.wa { font-style: italic; } /* Warning */
+
+@media print {
+  code.sourceCode {
+    white-space: pre-wrap;
+  }
+  a.sourceLine {
+    text-indent: -1em;
+    padding-left: 1em;
+  }
+}
+
+pre.numberSource a.sourceLine {
+  position: relative;
+  left: -4em;
+}
+
+pre.numberSource a.sourceLine::before {
+  content: attr(title);
+  position: relative;
+  left: -1em;
+  text-align: right;
+  vertical-align: baseline;
+  border: none;
+  pointer-events: all;
+  display: inline-block;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  padding: 0 4px;
+  width: 4em;
+}
+
+pre.numberSource {
+  margin-left: 3em;
+  padding-left: 4px;
+}
+
+div.sourceCode {}
+
+@media screen {
+  a.sourceLine::before {
+    text-decoration: underline;
+  }
+}
+
+/* Alert */
+code span.al {
+  font-weight: bold;
+}
+
+/* Annotation */
+code span.an {
+  font-style: italic;
+}
+
+/* ControlFlow */
+code span.cf {
+  font-weight: bold;
+}
+
+/* Comment */
+code span.co {
+  font-style: italic;
+}
+
+/* CommentVar */
+code span.cv {
+  font-style: italic;
+}
+
+/* Documentation */
+code span.do {
+  font-style: italic;
+}
+
+/* DataType */
+code span.dt {
+  text-decoration: underline;
+}
+
+/* Error */
+code span.er {
+  font-weight: bold;
+}
+
+/* Information */
+code span.in {
+  font-style: italic;
+}
+
+/* Keyword */
+code span.kw {
+  font-weight: bold;
+}
+
+/* Preprocessor */
+code span.pp {
+  font-weight: bold;
+}
+
+/* Warning */
+code span.wa {
+  font-style: italic;
+}
     </style>
 
-	<link rel="alternate" type="application/rss+xml" href="feed.xml" title="1823's programming ramblings">
+    <link rel="alternate" type="application/rss+xml" href="feed.xml" title="d1823's programming ramblings">
 </head>
 <body>
-	<header>
-		<h1>1823's programming ramblings</h1>
+    <header>
+        <h1>d1823's programming ramblings</h1>
 
-		<hr>
-	</header>
+        <hr>
+    </header>
 
-            <article>
+    
+            <article id="hooking-ddcutil-with-pop-os-launcher">
+            <header>
+                <a href="#hooking-ddcutil-with-pop-os-launcher">
+                    <h2>Hooking ddcutil with Pop!_OS applications launcher</h2>
+                </a>
+
+                <small>from <time datetime="2021-10-03">October 03, 2021</time></small>
+            </header>
+
             <section>
-                No articles available yet.
+                <p>In the article <a href="https://1823.pl/#using-mccs-to-control-brightess-of-my-screen">Controlling my screen using MCCS</a> I’ve shown how to use ddcutil to change both contrast and brightness of your monitor without touching its physical controls. Here, I want to show you how I got it hooked with Pop!_OS (or any DE, really) application launcher for ease of use.</p>
+<p>Most Desktop Environments allow the user to quickly launch an application by showing a launcher. Whether it’s something similiar to macOS’s Spotlight, or Windows’s Menu Start, it will allow you to launch a new application with just a few keystrokes.</p>
+<p>On Linux, as many of you probably already know, the entries showed by that launcher are stored in one of the directories listed in <code>$XDG_DATA_DIRS</code> as defined by the <a href="https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html">XDG Desktop Entry specification</a>. Each of these directories contain files with <code>.desktop</code> extension. If you’d open one of these files, you’d find the content is something like this:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode ini"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">[Desktop Entry]</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="dt">Version</span><span class="ot">=</span><span class="fl">1.0</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="dt">Name</span><span class="ot">=</span><span class="st">Firefox Web Browser</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="dt">Comment</span><span class="ot">=</span><span class="st">Browse the World Wide Web</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="dt">GenericName</span><span class="ot">=</span><span class="st">Web Browser</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="dt">Keywords</span><span class="ot">=</span><span class="st">Internet;WWW;Browser;Web;Explorer</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="dt">Exec</span><span class="ot">=</span><span class="st">firefox %u</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="dt">Terminal</span><span class="ot">=</span><span class="kw">false</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="dt">X-MultipleArgs</span><span class="ot">=</span><span class="kw">false</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="dt">Type</span><span class="ot">=</span><span class="st">Application</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="dt">Icon</span><span class="ot">=</span><span class="st">firefox</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="dt">Categories</span><span class="ot">=</span><span class="st">GNOME;GTK;Network;WebBrowser;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="dt">MimeType</span><span class="ot">=</span><span class="st">text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;x-scheme-handler/chrome;video/webm;application/x-xpinstall;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="dt">StartupNotify</span><span class="ot">=</span><span class="kw">true</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="dt">Actions</span><span class="ot">=</span><span class="st">new-window;new-private-window;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="kw">[Desktop Action new-window]</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="dt">Name</span><span class="ot">=</span><span class="st">Open a New Window</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="dt">Exec</span><span class="ot">=</span><span class="st">firefox -new-window</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="kw">[Desktop Action new-private-window]</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="dt">Name</span><span class="ot">=</span><span class="st">Open a New Private Window</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a><span class="dt">Exec</span><span class="ot">=</span><span class="st">firefox -private-window</span></span></code></pre></div>
+<p>All of the above is nothing else but a specification to what should happen, when the XDG compliant program tries to analyze one of these files. It’ll find fields like name, keywords, the path to the binary (or a command string) or an icon.</p>
+<p>My idea was to create a Desktop file for each of the brightness and contrast levels I wanted my monitor to be set to. I’ve decided to keep these two properties set to the same level, because that’s how I got the best results in my case, although YMMV. In my case, given both properties are ranged from 0 to 100, the following levels were setup: Darker (40), Dark (45), Dimmer (50), Dim (57), Default (65), Light (70), Lighter (80). The number of levels and the values are the result of day to day usage. Initially started with three or four, but found out that they didn’t fit well enough on some days as the screen was either too bright or too dim.</p>
+<p>I also decided I don’t want to keep these values in Desktop files directly. Over the years, I’ve found the hard way that keeping these kinds of settings outside of my VCS backed configuration is a bad idea. That’s how I created a little utility called <code>displaymgr</code> which is nothing else but a simple shell script.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">if</span><span class="bu"> [</span> <span class="st">&quot;</span><span class="va">$EUID</span><span class="st">&quot;</span> <span class="ot">-ne</span> 0<span class="bu"> ]</span>; <span class="kw">then</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>  <span class="bu">echo</span> <span class="st">&quot;Please run as with elevated privileges.&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>  <span class="bu">exit</span> 1</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="kw">fi</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="va">PACKAGE=$(</span><span class="fu">basename</span> <span class="st">&quot;</span><span class="va">$0</span><span class="st">&quot;</span><span class="va">)</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="kw">function</span><span class="fu"> print_help()</span> <span class="kw">{</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>  <span class="bu">echo</span> <span class="st">&quot;Usage: ./</span><span class="va">$PACKAGE</span><span class="st"> &lt;preset&gt;&quot;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>  <span class="bu">echo</span> <span class="st">&quot;A small utility that allows to control the display supporting MCCS procotol.&quot;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>  <span class="bu">echo</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>  <span class="bu">echo</span> <span class="st">&quot;Arguments:&quot;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>  <span class="bu">echo</span> <span class="st">&quot;  preset              Can be darker, dark, dimmer, dim, default, light or lighter.&quot;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="kw">}</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a><span class="va">BRIGHTNESS_VCP=</span>10</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a><span class="va">CONTRAST_VCP=</span>12</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a><span class="va">PRESET_DARKER=</span>40</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a><span class="va">PRESET_DARK=</span>45</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a><span class="va">PRESET_DIMMER=</span>50</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a><span class="va">PRESET_DIM=</span>57</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a><span class="va">PRESET_DEFAULT=</span>65</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a><span class="va">PRESET_LIGHT=</span>75</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a><span class="va">PRESET_LIGHTER=</span>80</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a><span class="va">CHOSEN_PRESET=</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true"></a><span class="kw">while</span> <span class="bu">test</span> <span class="va">$#</span> -gt 0<span class="kw">;</span> <span class="kw">do</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true"></a>  <span class="kw">case</span> <span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span><span class="kw"> in</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true"></a>    darker<span class="kw">)</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_DARKER</span><span class="st">&quot;</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true"></a>      <span class="bu">shift</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true"></a>      <span class="kw">;;</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true"></a>    dark<span class="kw">)</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_DARK</span><span class="st">&quot;</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true"></a>      <span class="bu">shift</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true"></a>      <span class="kw">;;</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true"></a>    dimmer<span class="kw">)</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_DIMMER</span><span class="st">&quot;</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true"></a>      <span class="bu">shift</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true"></a>      <span class="kw">;;</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true"></a>    dim<span class="kw">)</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_DIM</span><span class="st">&quot;</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true"></a>      <span class="bu">shift</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true"></a>      <span class="kw">;;</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true"></a>    default<span class="kw">)</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_DEFAULT</span><span class="st">&quot;</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true"></a>      <span class="bu">shift</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true"></a>      <span class="kw">;;</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true"></a>    light<span class="kw">)</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_LIGHT</span><span class="st">&quot;</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true"></a>      <span class="bu">shift</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true"></a>      <span class="kw">;;</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true"></a>    lighter<span class="kw">)</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_LIGHTER</span><span class="st">&quot;</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true"></a>      <span class="bu">shift</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true"></a>      <span class="kw">;;</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true"></a>    *<span class="kw">)</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true"></a>      <span class="bu">break</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true"></a>      <span class="kw">;;</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true"></a>  <span class="kw">esac</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true"></a><span class="kw">done</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true"></a></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true"></a><span class="kw">if</span><span class="bu"> [</span> <span class="ot">-z</span> <span class="st">&quot;</span><span class="va">$CHOSEN_PRESET</span><span class="st">&quot;</span><span class="bu"> ]</span>; <span class="kw">then</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true"></a>  <span class="ex">print_help</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true"></a>  <span class="bu">exit</span> 1</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true"></a><span class="kw">fi</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true"></a></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true"></a><span class="ex">/usr/bin/ddcutil</span> setvcp <span class="st">&quot;</span><span class="va">$BRIGHTNESS_VCP</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$CHOSEN_PRESET</span><span class="st">&quot;</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true"></a><span class="ex">/usr/bin/ddcutil</span> setvcp <span class="st">&quot;</span><span class="va">$CONTRAST_VCP</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$CHOSEN_PRESET</span><span class="st">&quot;</span></span></code></pre></div>
+<p>First and foremost, it can be used directly from the CLI. Invoking <code>displaymgr default</code> will set my monitor’s brightness and contrast to 65. Knowing it works on the commandline, I created the corresponding Desktop files. All of them share the same structure, while the preset name is the only difference.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode ini"><code class="sourceCode ini"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">[Desktop Entry]</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="dt">Name</span><span class="ot">=</span><span class="st">Brightness: </span><span class="kw">Default</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="dt">TryExec</span><span class="ot">=</span><span class="st">displaymgr</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="dt">Exec</span><span class="ot">=</span><span class="st">sudo displaymgr </span><span class="kw">default</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="dt">Type</span><span class="ot">=</span><span class="st">Application</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="dt">Icon</span><span class="ot">=</span><span class="st">display-brightness-symbolic</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="dt">Keywords</span><span class="ot">=</span><span class="st">display;brightness;</span><span class="kw">default</span><span class="st">;reset;standard;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="dt">Categories</span><span class="ot">=</span><span class="st">Utility;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="dt">StartupNotify</span><span class="ot">=</span><span class="kw">false</span></span></code></pre></div>
+<p>With all of that done, I was now able to control the brightness and contrast of my monitor just as simply as launching an application.</p>
+<figure>
+<img src="https://1823.pl/hooking-ddcutil-with-pop-os-launcher--launcher.png" alt="" /><figcaption>Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM</figcaption>
+</figure>
             </section>
         </article>
-    
-	</body>
+            <article id="using-mccs-to-control-brightess-of-my-screen">
+            <header>
+                <a href="#using-mccs-to-control-brightess-of-my-screen">
+                    <h2>Controlling my screen using MCCS</h2>
+                </a>
+
+                <small>from <time datetime="2021-08-28">August 28, 2021</time></small>
+            </header>
+
+            <section>
+                <p>The window in my home office heads straight south. It means the amount of light I get in my room throughout the day varies from very little to a lot. In a way, it’s great, because I don’t feel like I’m losing the whole day sitting in a box with some artificial light. At the same time, adjusting my screen to match the light intensity in my room every two hours isn’t the most convenient thing to do at all. For a long time I’ve been using f.lux on Windows and Redshift on Linux. These worked fine, although I’ve never been a fan of changing the color temperature to make the screen bearable. At some point I’ve dropped both of these and started adjusting the brightness and contrast levels of my screen manually. As you can imagine, it got tedious after a while. This article describes my way of solving it in a semi-automatic way.</p>
+<p>Many people probably don’t realize that monitors we’re nowadays using with our computers are capable of communicating with operating systems in a more sophisticated way than just determining whether the screen is on or off. I certainly didn’t. Most if not all modern monitors support <em>Monitor Control Command Set</em> (MCCS) over I2C bus. The MCCS is nothing else but a standard defining a set of parameters that can be adjusted by poking the monitor over any supported protocol - in our case, I2C.</p>
+<p>After learning all that’s the case, I began looking for something that would allow me to easily leverage the MCCS. I didn’t look far when I found <a href="https://www.ddcutil.com/">ddcutil</a>. Unfortunately, it’s Linux-only. Since I’m not using Windows anymore, I’m not sure how it looks there. Last I heard, some Intel graphics drivers were exposing MCCS related settings as part of their control panel. Also, according to that tool’s website, I2C is only used by external monitors. Laptop screens aren’t using I2C so the following method isn’t supported.</p>
+<p>The goal now was to use <em>ddcutil</em> to change the brightness and contrast level of my monitor. Reading the manpages revealed the first thing I had to do was to obtain two unique VCP codes identifying the properties used by my monitor to control these parameters. Running <code>$ ddcutil vpcinfo</code> gave me a long list which contained these two (although YMMV):</p>
+<pre><code>VCP code 10: Brightness
+   Increase/decrease the brightness of the image.
+   MCCS versions: 2.0, 2.1, 3.0, 2.2
+   ddcutil feature subsets: PROFILE, COLOR
+   Attributes: Read Write, Continuous (normal)</code></pre>
+<pre><code>VCP code 12: Contrast
+   Increase/decrease the contrast of the image.
+   MCCS versions: 2.0, 2.1, 3.0, 2.2
+   ddcutil feature subsets: PROFILE, COLOR
+   Attributes: Read Write, Continuous (normal)</code></pre>
+<p>Having the above, I was now able to call the <em>setvcp</em> command of <em>ddcutil</em> with both the VCP code for brightness and the desired brightness level. The same applied to contrast. The manpages state the value must be in range of 0 to 255, but given both the brightness and contrast levels of my monitor can be set from 0 to 100, it seemed reasonable to ignore it. My inner nerd tells me it would be really cool to be able to set any of these to 255… Anyway.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="ex">ddcutil</span> setvcp <span class="va">$BRIGHTNESS_VCP</span> <span class="va">$BRIGHTNESS_VALUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>$ <span class="ex">ddcutil</span> setvcp <span class="va">$CONTRAST_VCP</span> <span class="va">$CONTRAST_VALUE</span></span></code></pre></div>
+<p>That was it. Executing these made my monitor immediately adjust the levels to my liking.</p>
+<p>Of course, being a programmer comes with a certain degree of a responsibility so I couldn’t just stop there. I had to hook it up somehow so I didn’t have to run these from the CLI. Unfortunately, how I did that, is a question I’ll be answering in another article.</p>
+            </section>
+        </article>
+    </body>
 </html>

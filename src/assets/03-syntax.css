@@ -14,7 +14,7 @@ a.sourceLine:empty {
 }
 
 .sourceCode {
-  overflow: visible;
+  overflow: auto;
 }
 
 code.sourceCode {

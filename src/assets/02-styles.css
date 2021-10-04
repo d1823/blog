@@ -40,6 +40,7 @@ pre, code {
 
 pre {
   padding: 1rem;
+  overflow: auto;
 }
 
 a {

@@ -48,12 +48,23 @@ a {
   color: var(--color-href);
 }
 
+hr {
+  display: block;
+  width: 100%;
+}
+
 a:hover {
   text-decoration: underline;
 }
 
 body > header {
-  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+body > header nav {
+  color: var(--color-muted);
 }
 
 article + article {
@@ -99,4 +110,9 @@ article figure figcaption {
   font-size: .9rem;
   text-align: center;
   color: var(--color-muted);
+}
+
+footer {
+  color: var(--color-muted);
+  margin-top: .5rem;
 }

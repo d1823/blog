@@ -8,6 +8,11 @@ $articles_dir = __DIR__ . "/articles";
 $page_title = "d1823's programming ramblings";
 $page_description = "d1823's programming ramblings";
 $page_url = $argc > 1 ? $argv[1] : "https://1823.pl/";
+$email_address = "ramblings@1823.pl";
+$twitter_username = "_d1823";
+
+system("rm -r $build_dir");
+system("mkdir -p $build_dir");
 
 $styles = array_reduce(files_from_dir("$src_dir/assets"), function (string $styles, string $asset_pathname): string {
     return $styles . file_get_contents($asset_pathname);
@@ -54,13 +59,22 @@ usort($articles, function (object $article, object $other_article) {
     return $other_article->date->getTimestamp() <=> $article->date->getTimestamp();
 });
 
-system("mkdir -p $build_dir");
-system("rm -f $build_dir/index.html");
-system("rm -f $build_dir/feed.xml");
+file_put_contents("$build_dir/CNAME", parse_url($page_url, PHP_URL_HOST));
 
 file_put_contents(
     "$build_dir/index.html",
-    render_to_string("$src_dir/index.html.php", compact('page_title', 'page_description', 'page_url', 'styles', 'feed', 'articles'))
+    render_to_string(
+        "$src_dir/base.html.php",
+        compact('page_title', 'page_description', 'page_url', 'styles', 'feed') + ['content' => render_to_string("$src_dir/articles.html.php", compact('articles'))]
+    )
+);
+
+file_put_contents(
+    "$build_dir/contact.html",
+    render_to_string(
+        "$src_dir/base.html.php",
+        compact('page_title', 'page_description', 'page_url', 'styles', 'feed') + ['content' => render_to_string("$src_dir/contact.html.php", compact('email_address', 'twitter_username'))]
+    )
 );
 
 file_put_contents(
@@ -84,7 +98,7 @@ function files_from_dir(string $path, string $extension = null): array {
     return $paths;
 }
 
-function render_to_string(string $template_path, array $content): string {
+function render_to_string(string $template_path, array $content = []): string {
     extract($content);
 
     ob_start();

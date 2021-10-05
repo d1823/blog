@@ -1,17 +1,19 @@
 #!/usr/bin/env php
 <?php
 
-$build_dir = __DIR__ . "/docs";
+$is_served_locally = $argc > 1 && $argv[1] === '--local';
+
+$build_dir = $is_served_locally ? __DIR__ . "/local-docs" : __DIR__ . "/docs";
 $src_dir = __DIR__ . "/src";
 $articles_dir = __DIR__ . "/articles";
 
 $page_title = "d1823's programming ramblings";
 $page_description = "d1823's programming ramblings";
-$page_url = $argc > 1 ? $argv[1] : "https://1823.pl/";
+$page_url = $is_served_locally ? 'http://localhost:8080' : "https://1823.pl/";
 $email_address = "ramblings@1823.pl";
 $twitter_username = "_d1823";
 
-system("rm -r $build_dir");
+system("rm -fr $build_dir");
 system("mkdir -p $build_dir");
 
 $styles = array_reduce(files_from_dir("$src_dir/assets"), function (string $styles, string $asset_pathname): string {

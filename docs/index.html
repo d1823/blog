@@ -410,12 +410,23 @@ a {
   color: var(--color-href);
 }
 
+hr {
+  display: block;
+  width: 100%;
+}
+
 a:hover {
   text-decoration: underline;
 }
 
 body > header {
-  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+body > header nav {
+  color: var(--color-muted);
 }
 
 article + article {
@@ -461,6 +472,11 @@ article figure figcaption {
   font-size: .9rem;
   text-align: center;
   color: var(--color-muted);
+}
+
+footer {
+  color: var(--color-muted);
+  margin-top: .5rem;
 }
 a.sourceLine {
   display: inline-block;
@@ -614,21 +630,25 @@ code span.wa {
     <header>
         <h1>d1823's programming ramblings</h1>
 
-        <hr>
+        <nav>
+            <a href="/">articles</a> | <a href="/contact.html">about</a>
+        </nav>
     </header>
 
+    <hr>
+
     
-            <article id="using-ddcutil-with-pop-os-launcher">
-            <header>
-                <a href="#using-ddcutil-with-pop-os-launcher">
-                    <h2>Using ddcutil with Pop!_OS Applications Launcher</h2>
-                </a>
+    <article id="using-ddcutil-with-pop-os-launcher">
+        <header>
+            <a href="#using-ddcutil-with-pop-os-launcher">
+                <h2>Using ddcutil with Pop!_OS Applications Launcher</h2>
+            </a>
 
-                <small>from <time datetime="2021-10-03">October 03, 2021</time></small>
-            </header>
+            <small>from <time datetime="2021-10-03">October 03, 2021</time></small>
+        </header>
 
-            <section>
-                <p>In the article <a href="#controlling-my-screen-using-mccs">Controlling my screen using MCCS</a> I’ve shown how to use ddcutil to change both contrast and brightness of your monitor without touching its physical controls. Here, I want to show you how I got it hooked with Pop!_OS (or any DE, really) application launcher for ease of use.</p>
+        <section>
+            <p>In the article <a href="#controlling-my-screen-using-mccs">Controlling my screen using MCCS</a> I’ve shown how to use ddcutil to change both contrast and brightness of your monitor without touching its physical controls. Here, I want to show you how I got it hooked with Pop!_OS (or any DE, really) application launcher for ease of use.</p>
 <p>Most Desktop Environments allow the user to quickly launch an application by showing a launcher. Whether it’s something similiar to macOS’s Spotlight, or Windows’s Menu Start, it will allow you to launch a new application with just a few keystrokes.</p>
 <p>On Linux, as many of you probably already know, the entries showed by that launcher are stored in one of the directories listed in <code>$XDG_DATA_DIRS</code> as defined by the <a href="https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html">XDG Desktop Entry specification</a>. Each of these directories contain files with <code>.desktop</code> extension. If you’d open one of these files, you’d find the content is something like this:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode ini"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">[Desktop Entry]</span></span>
@@ -744,19 +764,19 @@ code span.wa {
 <figure>
 <img src="https://1823.pl/using-ddcutil-with-pop-os-launcher--launcher.png" alt="" /><figcaption>Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM</figcaption>
 </figure>
-            </section>
-        </article>
-            <article id="controlling-my-screen-using-mccs">
-            <header>
-                <a href="#controlling-my-screen-using-mccs">
-                    <h2>Controlling my screen using MCCS</h2>
-                </a>
+        </section>
+    </article>
+    <article id="controlling-my-screen-using-mccs">
+        <header>
+            <a href="#controlling-my-screen-using-mccs">
+                <h2>Controlling my screen using MCCS</h2>
+            </a>
 
-                <small>from <time datetime="2021-08-28">August 28, 2021</time></small>
-            </header>
+            <small>from <time datetime="2021-08-28">August 28, 2021</time></small>
+        </header>
 
-            <section>
-                <p>The window in my home office heads straight south. It means the amount of light I get in my room throughout the day varies from very little to a lot. In a way, it’s great, because I don’t feel like I’m losing the whole day sitting in a box with some artificial light. At the same time, adjusting my screen to match the light intensity in my room every two hours isn’t the most convenient thing to do at all. For a long time I’ve been using f.lux on Windows and Redshift on Linux. These worked fine, although I’ve never been a fan of changing the color temperature to make the screen bearable. At some point I’ve dropped both of these and started adjusting the brightness and contrast levels of my screen manually. As you can imagine, it got tedious after a while. This article describes my way of solving it in a semi-automatic way.</p>
+        <section>
+            <p>The window in my home office heads straight south. It means the amount of light I get in my room throughout the day varies from very little to a lot. In a way, it’s great, because I don’t feel like I’m losing the whole day sitting in a box with some artificial light. At the same time, adjusting my screen to match the light intensity in my room every two hours isn’t the most convenient thing to do at all. For a long time I’ve been using f.lux on Windows and Redshift on Linux. These worked fine, although I’ve never been a fan of changing the color temperature to make the screen bearable. At some point I’ve dropped both of these and started adjusting the brightness and contrast levels of my screen manually. As you can imagine, it got tedious after a while. This article describes my way of solving it in a semi-automatic way.</p>
 <p>Many people probably don’t realize that monitors we’re nowadays using with our computers are capable of communicating with operating systems in a more sophisticated way than just determining whether the screen is on or off. I certainly didn’t. Most if not all modern monitors support <em>Monitor Control Command Set</em> (MCCS) over I2C bus. The MCCS is nothing else but a standard defining a set of parameters that can be adjusted by poking the monitor over any supported protocol - in our case, I2C.</p>
 <p>After learning all that’s the case, I began looking for something that would allow me to easily leverage the MCCS. I didn’t look far when I found <a href="https://www.ddcutil.com/">ddcutil</a>. Unfortunately, it’s Linux-only. Since I’m not using Windows anymore, I’m not sure how it looks there. Last I heard, some Intel graphics drivers were exposing MCCS related settings as part of their control panel. Also, according to that tool’s website, I2C is only used by external monitors. Laptop screens aren’t using I2C so the following method isn’t supported.</p>
 <p>The goal now was to use <em>ddcutil</em> to change the brightness and contrast level of my monitor. Reading the manpages revealed the first thing I had to do was to obtain two unique VCP codes identifying the properties used by my monitor to control these parameters. Running <code>$ ddcutil vpcinfo</code> gave me a long list which contained these two (although YMMV):</p>
@@ -775,7 +795,12 @@ code span.wa {
 <div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>$ <span class="ex">ddcutil</span> setvcp <span class="va">$CONTRAST_VCP</span> <span class="va">$CONTRAST_VALUE</span></span></code></pre></div>
 <p>That was it. Executing these made my monitor immediately adjust the levels to my liking.</p>
 <p>Of course, being a programmer comes with a certain degree of a responsibility so I couldn’t just stop there. I had to hook it up somehow so I didn’t have to run these from the CLI. Unfortunately, how I did that, is a question I’ll be answering in another article.</p>
-            </section>
-        </article>
-    </body>
+        </section>
+    </article>
+
+    <footer>
+        <hr>
+        <p>Copyright &copy; 2020-2021 <a href="/contact.html">d1823</a>. All rights reserved.</p>
+    </footer>
+</body>
 </html>

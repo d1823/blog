@@ -6,7 +6,7 @@
 
     <title><?= $page_title ?></title>
     <meta name="description" content="<?= $page_description ?>">
-    <base href="<?= $page_url ?>" target="_blank">
+    <base href="<?= $page_url ?>">
     <meta name="color-scheme" content="dark light">
 
     <style>

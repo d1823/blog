@@ -60,11 +60,23 @@ a:hover {
 body > header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
 }
 
-body > header nav {
+nav {
   color: var(--color-muted);
+  margin-bottom: 1.5rem;
+}
+
+@media screen and (min-width: 1024px) {
+  body > header {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  nav {
+    margin-bottom: 0;
+  }
 }
 
 article + article {

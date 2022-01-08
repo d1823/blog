@@ -8,7 +8,7 @@ Many people probably don't realize that monitors we're nowadays using with our c
 
 After learning all that's the case, I began looking for something that would allow me to easily leverage the MCCS. I didn't look far when I found [ddcutil](https://www.ddcutil.com/). Unfortunately, it's Linux-only. Since I'm not using Windows anymore, I'm not sure how it looks there. Last I heard, some Intel graphics drivers were exposing MCCS related settings as part of their control panel. Also, according to that tool's website, I2C is only used by external monitors. Laptop screens aren't using I2C so the following method isn't supported.
 
-The goal now was to use *ddcutil* to change the brightness and contrast level of my monitor. Reading the manpages revealed the first thing I had to do was to obtain two unique VCP codes identifying the properties used by my monitor to control these parameters. Running `$ ddcutil vpcinfo` gave me a long list which contained these two (although YMMV):
+The goal now was to use *ddcutil* to change the brightness and contrast level of my monitor. Reading the manpages revealed the first thing I had to do was to obtain two unique VCP codes identifying the properties used by my monitor to control these parameters. Running `$ ddcutil vcpinfo` gave me a long list which contained these two (although YMMV):
 
 ```
 VCP code 10: Brightness

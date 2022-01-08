@@ -656,6 +656,22 @@ code span.wa {
     <hr>
 
     
+    <article id="launching-displaymgr-without-sudo">
+        <header>
+            <a href="#launching-displaymgr-without-sudo">
+                <h2>Launching displaymgr without sudo</h2>
+            </a>
+
+            <small>from <time datetime="2022-01-08">January 08, 2022</time></small>
+        </header>
+
+        <section>
+            <p>Last time I’ve described a relatively easy way to control the brightness and contrast of your screen. It didn’t occur to me that what I’ve shown is kind of incomplete. The resulting utility does work but it requires you to use sudo to run it. It also means that launching it via <code>.desktop</code> file won’t work unless the WM is running with elevated privileges (please don’t do that, seriously).</p>
+<p>Given that you’ve put the <code>displaymgr</code> binary at <code>/usr/local/bin/displaymgr</code>, you can execute <code>visudo /etc/sudoers.d/displaymgr</code> and save the file with the content below. This configuration will let the displaymgr binary run with elevated privileges by default, for every user. In other words, running it is as simple as <code>displaymgr default</code>, so no sudo, or sudo password is required.</p>
+<pre><code>Cmnd_Alias DISPLAYMGR=/usr/local/bin/displaymgr
+ALL ALL=NOPASSWD: DISPLAYMGR</code></pre>
+        </section>
+    </article>
     <article id="using-ddcutil-with-pop-os-launcher">
         <header>
             <a href="#using-ddcutil-with-pop-os-launcher">

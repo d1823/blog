@@ -6,6 +6,11 @@
         <description>d1823's programming ramblings</description>
 
                    <item>
+               <title>Launching displaymgr without sudo</title>
+               <description>How to configure sudoers to use displaymgr without sudo</description>
+               <link>https://1823.pl/#launching-displaymgr-without-sudo</link>
+           </item>
+                  <item>
                <title>Using ddcutil with Pop!_OS Applications Launcher</title>
                <description>Using Pop!_OS Applications Launcher to control the brightness of my screen</description>
                <link>https://1823.pl/#using-ddcutil-with-pop-os-launcher</link>

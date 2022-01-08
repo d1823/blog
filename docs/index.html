@@ -797,7 +797,7 @@ code span.wa {
             <p>The window in my home office heads straight south. It means the amount of light I get in my room throughout the day varies from very little to a lot. In a way, it’s great, because I don’t feel like I’m losing the whole day sitting in a box with some artificial light. At the same time, adjusting my screen to match the light intensity in my room every two hours isn’t the most convenient thing to do at all. For a long time I’ve been using f.lux on Windows and Redshift on Linux. These worked fine, although I’ve never been a fan of changing the color temperature to make the screen bearable. At some point I’ve dropped both of these and started adjusting the brightness and contrast levels of my screen manually. As you can imagine, it got tedious after a while. This article describes my way of solving it in a semi-automatic way.</p>
 <p>Many people probably don’t realize that monitors we’re nowadays using with our computers are capable of communicating with operating systems in a more sophisticated way than just determining whether the screen is on or off. I certainly didn’t. Most if not all modern monitors support <em>Monitor Control Command Set</em> (MCCS) over I2C bus. The MCCS is nothing else but a standard defining a set of parameters that can be adjusted by poking the monitor over any supported protocol - in our case, I2C.</p>
 <p>After learning all that’s the case, I began looking for something that would allow me to easily leverage the MCCS. I didn’t look far when I found <a href="https://www.ddcutil.com/">ddcutil</a>. Unfortunately, it’s Linux-only. Since I’m not using Windows anymore, I’m not sure how it looks there. Last I heard, some Intel graphics drivers were exposing MCCS related settings as part of their control panel. Also, according to that tool’s website, I2C is only used by external monitors. Laptop screens aren’t using I2C so the following method isn’t supported.</p>
-<p>The goal now was to use <em>ddcutil</em> to change the brightness and contrast level of my monitor. Reading the manpages revealed the first thing I had to do was to obtain two unique VCP codes identifying the properties used by my monitor to control these parameters. Running <code>$ ddcutil vpcinfo</code> gave me a long list which contained these two (although YMMV):</p>
+<p>The goal now was to use <em>ddcutil</em> to change the brightness and contrast level of my monitor. Reading the manpages revealed the first thing I had to do was to obtain two unique VCP codes identifying the properties used by my monitor to control these parameters. Running <code>$ ddcutil vcpinfo</code> gave me a long list which contained these two (although YMMV):</p>
 <pre><code>VCP code 10: Brightness
    Increase/decrease the brightness of the image.
    MCCS versions: 2.0, 2.1, 3.0, 2.2
@@ -818,7 +818,7 @@ code span.wa {
 
     <footer>
         <hr>
-        <p>Copyright &copy; 2020-2021 <a href="/contact.html">d1823</a>. All rights reserved.</p>
+        <p>Copyright &copy; 2020-2022 <a href="/contact.html">d1823</a>. All rights reserved.</p>
     </footer>
 </body>
 </html>

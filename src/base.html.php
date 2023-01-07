@@ -26,11 +26,11 @@
 
     <hr>
 
-    <?php echo $content; ?>
+    <?= $content ?>
 
     <footer>
         <hr>
-        <p>Copyright &copy; 2020-<?php echo date_format(new DateTime(), 'Y'); ?> <a href="/contact.html">d1823</a>. All rights reserved.</p>
+        <p>Copyright &copy; 2020-<?php echo date_format(new DateTime(), 'Y'); ?> <a href="/contact.html">d1823</a>. This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</p>
     </footer>
 </body>
 </html>

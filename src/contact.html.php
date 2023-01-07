@@ -9,7 +9,7 @@
 </p>
 
 <p>
-    Oh! Also wanted to mention that I'm occasionaly contributing to <a href="https://github.com/SerenityOS/serenity">SerenityOS</a>. I'm not a regular contributor, but I find this project so cool that I can't stop bragging about it.<br>
+    Oh! Also wanted to mention that I'm occasionally contributing to <a href="https://github.com/SerenityOS/serenity">SerenityOS</a>. I'm not a regular contributor, but I find this project so cool that I can't stop bragging about it.<br>
     I encourage you to take a look at it!
 </p>
 

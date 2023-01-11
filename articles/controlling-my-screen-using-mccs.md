@@ -38,4 +38,4 @@ $ ddcutil setvcp $CONTRAST_VCP $CONTRAST_VALUE
 
 That was it. Executing these made my monitor immediately adjust the levels to my liking.
 
-Of course, being a programmer comes with a certain degree of a responsibility so I couldn't just stop there. I had to hook it up somehow so I didn't have to run these from the CLI. Unfortunately, how I did that, is a question I'll be answering in another article.
+Of course, being a programmer comes with a certain degree of a responsibility so I couldn't just stop there. I had to hook it up somehow so I didn't have to run these from the CLI. I've described my method in the [Changing the brightness and contrast using the application launcher](#changing-brightness-and-contrast-using-application-launcher).

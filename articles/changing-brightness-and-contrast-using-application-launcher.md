@@ -1,13 +1,13 @@
-[//]: # (TITLE: Using ddcutil with Pop!_OS Applications Launcher)
-[//]: # (DESCRIPTION: Using Pop!_OS Applications Launcher to control the brightness of my screen)
+[//]: # (TITLE: Changing the brightness and contrast using the application launcher)
+[//]: # (DESCRIPTION: Using application launcher to control the brightness and contrast of my screen)
 [//]: # (DATE: 2021-10-03)
+[//]: # (UPDATE DATE: 2023-01-11)
 
 In the article [Controlling my screen using MCCS](#controlling-my-screen-using-mccs) I've shown how to use ddcutil to change both contrast and brightness of your monitor without touching its physical controls. Here, I want to show you how I got it hooked with Pop!_OS (or any DE, really) application launcher for ease of use.
 
-
 Most Desktop Environments allow the user to quickly launch an application by showing a launcher. Whether it's something similiar to macOS's Spotlight, or Windows's Menu Start, it will allow you to launch a new application with just a few keystrokes.
 
-On Linux, as many of you probably already know, the entries showed by that launcher are stored in one of the directories listed in `$XDG_DATA_DIRS` as defined by the [XDG Desktop Entry specification](https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html). Each of these directories contain files with `.desktop` extension. If you'd open one of these files, you'd find the content is something like this:
+On Linux, as many of you probably already know, the entries shown by that launcher are stored in one of the directories listed in `$XDG_DATA_DIRS` as defined by the [XDG Desktop Entry specification](https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html). Each of these directories contain files with `.desktop` extension. If you'd open one of them, you'd find the content is something like this:
 
 ```ini
 [Desktop Entry]
@@ -35,17 +35,17 @@ Name=Open a New Private Window
 Exec=firefox -private-window
 ```
 
-All of the above is nothing else but a specification to what should happen, when the XDG compliant program tries to analyze one of these files. It'll find fields like name, keywords, the path to the binary (or a command string) or an icon.
+All of the above is nothing else but a specification to what should happen, when the XDG compliant program tries to analyze one of these files. It'll find fields like name, keywords, the path to the binary/command string or an icon.
 
 My idea was to create a Desktop file for each of the brightness and contrast levels I wanted my monitor to be set to. I've decided to keep these two properties set to the same level, because that's how I got the best results in my case, although YMMV. In my case, given both properties are ranged from 0 to 100, the following levels were setup: Darker (40), Dark (45), Dimmer (50), Dim (57), Default (65), Light (70), Lighter (80). The number of levels and the values are the result of day to day usage. Initially started with three or four, but found out that they didn't fit well enough on some days as the screen was either too bright or too dim.
 
-I also decided I don't want to keep these values in Desktop files directly. Over the years, I've found the hard way that keeping these kinds of settings outside of my VCS backed configuration is a bad idea. That's how I created a little utility called `displaymgr` which is nothing else but a simple shell script.
+I also decided I don't want to keep these values in Desktop files directly. Over the years, I've found the hard way that keeping these kinds of settings outside of my VCS backed configuration is a bad idea. That's how I created this little utility called `displaymgr` which is nothing else but a simple shell script.
 
 ```bash
 #!/usr/bin/env bash
 
 if [ "$EUID" -ne 0 ]; then
-  echo "Please run as with elevated privileges."
+  echo "Please run with elevated privileges."
   exit 1
 fi
 
@@ -117,7 +117,7 @@ fi
 /usr/bin/ddcutil setvcp "$CONTRAST_VCP" "$CHOSEN_PRESET"
 ```
 
-First and foremost, it can be used directly from the CLI. Invoking `displaymgr default` will set my monitor's brightness and contrast to 65. Knowing it works on the commandline, I created the corresponding Desktop files. All of them share the same structure, while the preset name is the only difference.
+First and foremost, it can be used directly from the CLI. Invoking `$ sudo displaymgr default` will set my monitor's brightness and contrast to 66. Knowing it works on the commandline, I created the corresponding Desktop files. All of them share the same structure, while the preset name is the only difference.
 
 ```ini
 [Desktop Entry]
@@ -131,7 +131,8 @@ Categories=Utility;
 StartupNotify=false
 ```
 
-With all of that done, I was now able to control the brightness and contrast of my monitor just as simply as launching an application.
+The last remaining thing is to make the displaymgr runnable without providing the password. To do that, execute `$ sudo visudo /etc/sudoers.d/displaymgr` and save it with the following content: `sudo visudo /etc/sudoers.d/displaymgr`.
 
-![Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM](using-ddcutil-with-pop-os-launcher--launcher)
+With all of that done, I was now able to control the brightness and contrast of my monitor just as easily as launching an application.
 
+![Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM](changing-brightness-and-contrast-using-application-launcher--launcher.png)

@@ -49,8 +49,9 @@ $articles_images = files_from_dir($articles_dir, "png");
  * 3. GENERATING THE CONTENT
  * -------------------------
  * Articles are written in Markdown and converted to HTML with Pandoc.
- * Each article needs to be annotated with three special markers
- * allowing to specify the title, description and date.
+ *
+ * Each article needs to be annotated with three special markers allowing
+ * to specify the title, description and date and update date.
  *
  * Markers are metadata that shouldn't be included in the generated
  * HTML output. They're defined using a neat trick utilizing the
@@ -73,41 +74,60 @@ $articles_images = files_from_dir($articles_dir, "png");
  *
  * I personally feel all of this is really neat.
  */
-$articles = array_map(function (string $pathname) use ($articles_dir, $articles_images, $build_dir, $page_url): stdClass {
-    $id = pathinfo($pathname, PATHINFO_FILENAME);
+$articles = array_map(
+    function (string $pathname) use ($articles_dir, $articles_images, $build_dir, $page_url): stdClass {
+        $id = pathinfo($pathname, PATHINFO_FILENAME);
 
-    $title = parse_title($pathname);
-    $description = parse_description($pathname);
-    $content = shell_exec("pandoc -f markdown -t html $pathname 2> /dev/null");
+        $title = parse_title($pathname);
+        $description = parse_description($pathname);
+        $content = shell_exec("pandoc -f markdown -t html $pathname 2> /dev/null");
 
-    if (!$content) {
-        throw new \RuntimeException("Converting markdown to html has failed. Make sure pandoc is installed.");
-    }
-
-    foreach ($articles_images as $image_pathname) {
-        if (!stristr($image_pathname, $id)) {
-            continue;
+        if (!$content) {
+            throw new \RuntimeException("Converting markdown to html has failed. Make sure pandoc is installed.");
         }
 
-        $image_basename = pathinfo($image_pathname, PATHINFO_BASENAME);
+        foreach ($articles_images as $image_pathname) {
+            if (!stristr($image_pathname, $id)) {
+                continue;
+            }
 
-        copy($image_pathname, "$build_dir/$image_basename");
-    }
+            $image_basename = pathinfo($image_pathname, PATHINFO_BASENAME);
 
-    $date = parse_date($pathname);
-    $time = $date->format('Y-m-d');
-    $human_time = $date->format('F d, Y');
+            copy($image_pathname, "$build_dir/$image_basename");
+        }
 
-    $url = "$page_url#$id";
+        $creation_date = parse_date($pathname);
+        $creation_time = $creation_date->format('Y-m-d');
+        $creation_human_time = $creation_date->format('F d, Y');
 
-    return (object) compact('id', 'title', 'description', 'date', 'time', 'human_time', 'content', 'url');
-}, files_from_dir($articles_dir, "md"));
+        $update_date = parse_update_date($pathname);
+        $update_time = $update_date?->format('Y-m-d');
+        $update_human_time = $update_date?->format('F d, Y');
+
+        $url = "$page_url#$id";
+
+        return (object)compact(
+            'id',
+            'title',
+            'description',
+            'creation_date',
+            'creation_time',
+            'creation_human_time',
+            'update_date',
+            'update_time',
+            'update_human_time',
+            'content',
+            'url'
+        );
+    },
+    files_from_dir($articles_dir, "md")
+);
 
 /**
  * 4. SORTING ARTICLES USING THEIR DATES
  */
 usort($articles, function (object $article, object $other_article) {
-    return $other_article->date->getTimestamp() <=> $article->date->getTimestamp();
+    return $other_article->creation_date->getTimestamp() <=> $article->creation_date->getTimestamp();
 });
 
 /**
@@ -129,7 +149,12 @@ file_put_contents(
     "$build_dir/index.html",
     render_to_string(
         "$src_dir/base.html.php",
-        compact('page_title', 'page_description', 'page_url', 'styles', 'feed') + ['content' => render_to_string("$src_dir/articles.html.php", compact('articles'))]
+        compact('page_title', 'page_description', 'page_url', 'styles', 'feed') + [
+            'content' => render_to_string(
+                "$src_dir/articles.html.php",
+                compact('articles')
+            )
+        ]
     )
 );
 
@@ -140,7 +165,12 @@ file_put_contents(
     "$build_dir/contact.html",
     render_to_string(
         "$src_dir/base.html.php",
-        compact('page_title', 'page_description', 'page_url', 'styles', 'feed') + ['content' => render_to_string("$src_dir/contact.html.php", compact('email_address', 'twitter_username'))]
+        compact('page_title', 'page_description', 'page_url', 'styles', 'feed') + [
+            'content' => render_to_string(
+                "$src_dir/contact.html.php",
+                compact('email_address', 'twitter_username')
+            )
+        ]
     )
 );
 
@@ -155,7 +185,8 @@ file_put_contents(
     render_to_string("$src_dir/feed.xml.php", compact('page_title', 'page_description', 'page_url', 'articles'))
 );
 
-function files_from_dir(string $path, string $extension = null): array {
+function files_from_dir(string $path, string $extension = null): array
+{
     $files = new FilesystemIterator($path);
 
     $files = array_filter(iterator_to_array($files), function (\SplFileInfo $file) use ($extension) {
@@ -171,7 +202,8 @@ function files_from_dir(string $path, string $extension = null): array {
     return $paths;
 }
 
-function render_to_string(string $template_path, array $content = []): string {
+function render_to_string(string $template_path, array $content = []): string
+{
     extract($content);
 
     ob_start();
@@ -179,7 +211,8 @@ function render_to_string(string $template_path, array $content = []): string {
     return ob_get_clean();
 }
 
-function parse_title(string $pathname): string {
+function parse_title(string $pathname): string
+{
     $title = parse_token("TITLE", $pathname);
 
     if (!$title) {
@@ -189,7 +222,8 @@ function parse_title(string $pathname): string {
     return $title;
 }
 
-function parse_description(string $pathname): string {
+function parse_description(string $pathname): string
+{
     $description = parse_token("DESCRIPTION", $pathname);
 
     if (!$description) {
@@ -218,11 +252,35 @@ function parse_date(string $pathname): DateTime
     return $date;
 }
 
-function parse_token(string $marker, string $pathname): string {
+function parse_update_date(string $pathname): ?DateTime
+{
+    try {
+        $date_format = 'Y-m-d';
+        $date_string = parse_token("UPDATE DATE", $pathname);
+    } catch (RuntimeException) {
+        return null;
+    }
+
+    $date = DateTime::createFromFormat(
+        $date_format,
+        $date_string
+    );
+
+    $errors = DateTime::getLastErrors();
+
+    if (!empty($errors['warning_count']) || $date === false) {
+        throw new \RuntimeException("$pathname: date $date_string isn't formatted as $date_format");
+    }
+
+    return $date;
+}
+
+function parse_token(string $marker, string $pathname): string
+{
     $token = "[//]: # ($marker:";
     $file_handle = fopen($pathname, 'r+');
 
-    while($line = fgets($file_handle)){
+    while ($line = fgets($file_handle)) {
         if (strpos($line, $token) === false) {
             continue;
         }

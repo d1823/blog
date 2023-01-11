@@ -13,7 +13,12 @@
                 <h2><?= $article->title ?></h2>
             </a>
 
-            <small>from <time datetime="<?= $article->time ?>"><?= $article->human_time ?></time></small>
+            <small>
+                from <time datetime="<?= $article->creation_time ?>"><?= $article->creation_human_time ?></time>
+            </small><?php if ($article->update_time): ?><small>
+                , modified <time datetime="<?= $article->update_time ?>"><?= $article->update_human_time ?></time>
+                </small>
+            <?php endif; ?>
         </header>
 
         <section>

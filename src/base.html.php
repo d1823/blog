@@ -13,6 +13,7 @@
         <?= $styles ?>
     </style>
 
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
     <link rel="alternate" type="application/rss+xml" href="<?= $feed ?>" title="<?= $page_title ?>">
 </head>
 <body>

@@ -802,8 +802,8 @@ code span.wa {
 
         <section>
             <p>The window in my home office heads straight south. It means the amount of light I get in my room throughout the day varies from very little to a lot. In a way, it’s great, because I don’t feel like I’m losing the whole day sitting in a box with some artificial light. At the same time, adjusting my screen to match the light intensity in my room every two hours isn’t the most convenient thing to do at all. For a long time I’ve been using f.lux on Windows and Redshift on Linux. These worked fine, although I’ve never been a fan of changing the color temperature to make the screen bearable. At some point I’ve dropped both of these and started adjusting the brightness and contrast levels of my screen manually. As you can imagine, it got tedious after a while. This article describes my way of solving it in a semi-automatic way.</p>
-<p>Many people probably don’t realize that monitors we’re nowadays using with our computers are capable of communicating with operating systems in a more sophisticated way than just determining whether the screen is on or off. I certainly didn’t. Most if not all modern monitors support <em>Monitor Control Command Set</em> (MCCS) over I2C bus. The MCCS is nothing else but a standard defining a set of parameters that can be adjusted by poking the monitor over any supported protocol - in our case, I2C.</p>
-<p>After learning all that’s the case, I began looking for something that would allow me to easily leverage the MCCS. I didn’t look far when I found <a href="https://www.ddcutil.com/">ddcutil</a>. Unfortunately, it’s Linux-only. Since I’m not using Windows anymore, I’m not sure how it looks there. Last I heard, some Intel graphics drivers were exposing MCCS related settings as part of their control panel. Also, according to that tool’s website, I2C is only used by external monitors. Laptop screens aren’t using I2C so the following method isn’t supported.</p>
+<p>Many people probably don’t realize that monitors we’re nowadays using with our computers are capable of communicating with operating systems in a more sophisticated way than just determining whether the screen is on or off. I certainly didn’t. Most if not all modern monitors support <em>Monitor Control Command Set</em> (MCCS) over I<sup>2</sup>C (<em>eye-squared-C</em>) bus. The MCCS is nothing else but a standard defining a set of parameters that can be adjusted by poking the monitor over any supported protocol - in our case, I<sup>2</sup>C.</p>
+<p>After learning all that’s the case, I began looking for something that would allow me to easily leverage the MCCS. I didn’t look far when I found <a href="https://www.ddcutil.com/">ddcutil</a>. Unfortunately, it’s Linux-only. Since I’m not using Windows anymore, I’m not sure how it looks there. Last I heard, some Intel graphics drivers were exposing MCCS related settings as part of their control panel. Also, according to that tool’s website, I<sup>2</sup>C is only used by external monitors. Laptop screens aren’t using I<sup>2</sup>C so the following method isn’t supported.</p>
 <p>The goal now was to use <em>ddcutil</em> to change the brightness and contrast level of my monitor. Reading the manpages revealed the first thing I had to do was to obtain two unique VCP codes identifying the properties used by my monitor to control these parameters. Running <code>$ ddcutil vcpinfo</code> gave me a long list which contained these two (although YMMV):</p>
 <pre><code>VCP code 10: Brightness
    Increase/decrease the brightness of the image.
@@ -815,9 +815,9 @@ code span.wa {
    MCCS versions: 2.0, 2.1, 3.0, 2.2
    ddcutil feature subsets: PROFILE, COLOR
    Attributes: Read Write, Continuous (normal)</code></pre>
-<p>Having the above, I was now able to call the <em>setvcp</em> command of <em>ddcutil</em> with both the VCP code for brightness and the desired brightness level. The same applied to contrast. The manpages state the value must be in range of 0 to 255, but given both the brightness and contrast levels of my monitor can be set from 0 to 100, it seemed reasonable to ignore it. My inner nerd tells me it would be really cool to be able to set any of these to 255… Anyway.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="ex">ddcutil</span> setvcp <span class="va">$BRIGHTNESS_VCP</span> <span class="va">$BRIGHTNESS_VALUE</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>$ <span class="ex">ddcutil</span> setvcp <span class="va">$CONTRAST_VCP</span> <span class="va">$CONTRAST_VALUE</span></span></code></pre></div>
+<p>Having the above, I was now able to call the <em>setvcp</em> command of <em>ddcutil</em> with both the VCP code for brightness and the desired brightness level. The same applied to contrast. The manpages state the value must be in range of 0 to 255, though keep in mind that the brightness and contrast levels of most monitors range from 0 to a 100.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="ex">ddcutil</span> setvcp 10 <span class="op">&lt;</span>brightness-level<span class="op">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>$ <span class="ex">ddcutil</span> setvcp 12 <span class="op">&lt;</span>contrast-level<span class="op">&gt;</span></span></code></pre></div>
 <p>That was it. Executing these made my monitor immediately adjust the levels to my liking.</p>
 <p>Of course, being a programmer comes with a certain degree of a responsibility so I couldn’t just stop there. I had to hook it up somehow so I didn’t have to run these from the CLI. I’ve described my method in the <a href="#changing-brightness-and-contrast-using-application-launcher">Changing the brightness and contrast using the application launcher</a>.</p>
         </section>
@@ -825,7 +825,10 @@ code span.wa {
 
     <footer>
         <hr>
-        <p>Copyright &copy; 2020-2023 <a href="/contact.html">d1823</a>. This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.</p>
+        <p>
+            Copyright &copy; 2020-2023 <a href="/contact.html">d1823</a>.<br>
+            This work is licensed under the <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+        </p>
     </footer>
 </body>
 </html>

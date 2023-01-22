@@ -131,7 +131,7 @@ Categories=Utility;
 StartupNotify=false
 ```
 
-The last remaining thing is to make the displaymgr runnable without providing the password. To do that, execute `$ sudo visudo /etc/sudoers.d/displaymgr` and save it with the following content: `sudo visudo /etc/sudoers.d/displaymgr`.
+The last remaining thing is to make the displaymgr runnable without providing the password. To do that, execute `$ sudo visudo /etc/sudoers.d/displaymgr` and save it with the following content: `ALL ALL = NOPASSWD:/usr/bin/displaymgr`.
 
 With all of that done, I was now able to control the brightness and contrast of my monitor just as easily as launching an application.
 

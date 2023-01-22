@@ -783,7 +783,7 @@ code span.wa {
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="dt">Keywords</span><span class="ot">=</span><span class="st">display;brightness;</span><span class="kw">default</span><span class="st">;reset;standard;</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="dt">Categories</span><span class="ot">=</span><span class="st">Utility;</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="dt">StartupNotify</span><span class="ot">=</span><span class="kw">false</span></span></code></pre></div>
-<p>The last remaining thing is to make the displaymgr runnable without providing the password. To do that, execute <code>$ sudo visudo /etc/sudoers.d/displaymgr</code> and save it with the following content: <code>sudo visudo /etc/sudoers.d/displaymgr</code>.</p>
+<p>The last remaining thing is to make the displaymgr runnable without providing the password. To do that, execute <code>$ sudo visudo /etc/sudoers.d/displaymgr</code> and save it with the following content: <code>ALL ALL = NOPASSWD:/usr/bin/displaymgr</code>.</p>
 <p>With all of that done, I was now able to control the brightness and contrast of my monitor just as easily as launching an application.</p>
 <figure>
 <img src="changing-brightness-and-contrast-using-application-launcher--launcher.png" alt="" /><figcaption>Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM</figcaption>

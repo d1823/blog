@@ -277,10 +277,17 @@ function parse_update_date(string $pathname): ?DateTime
 
 function parse_token(string $marker, string $pathname): string
 {
-    $token = "[//]: # ($marker:";
+    $token_prefix = "[//]: #";
+    $token = "$token_prefix ($marker:";
     $file_handle = fopen($pathname, 'r+');
 
     while ($line = fgets($file_handle)) {
+        if (strpos($line, $token_prefix) === false) {
+            fclose($file_handle);
+
+            break;
+        }
+
         if (strpos($line, $token) === false) {
             continue;
         }

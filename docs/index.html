@@ -668,78 +668,158 @@ code span.wa {
             </small>        </header>
 
         <section>
-            <p>This blog is handmade. I mean, of course, it is, right? Well, it depends on how you define “handmade”. For me, it means this blog is built using a set of readily available technologies and doesn’t require me to install anything that isn’t included in my distro’s repositories.</p>
-<p>Over the years I had a few failed attempts with blogging - I’ve tried blogger, wordpress.com, tumblr, hugo, jekyll and a few others. Nothing has stuck with me and while none of these solutions were the fault of my lack of enthusiasm, they didn’t feel like anything I’d want to use for an extended period. Mostly, I felt they were way too complex for what I wanted to do - ramble about stuff without worrying about security, complex themes, or configurations. I didn’t need any of it - instead, I wanted a simple solution that would gather the stuff I’ve written, repackage it and lay it out in some nice way. Years have passed, and trends have changed, but my requirements didn’t budge - I still wanted the same thing.</p>
+            <p>This blog is handmade. I mean, of course, it is, right? Well, it
+depends on how you define “handmade”. For me, it means this blog is
+built using a set of readily available technologies and doesn’t require
+me to install anything that isn’t included in my distro’s
+repositories.</p>
+<p>Over the years I had a few failed attempts with blogging - I’ve tried
+blogger, wordpress.com, tumblr, hugo, jekyll and a few others. Nothing
+has stuck with me and while none of these solutions were the fault of my
+lack of enthusiasm, they didn’t feel like anything I’d want to use for
+an extended period. Mostly, I felt they were way too complex for what I
+wanted to do - ramble about stuff without worrying about security,
+complex themes, or configurations. I didn’t need any of it - instead, I
+wanted a simple solution that would gather the stuff I’ve written,
+repackage it and lay it out in some nice way. Years have passed, and
+trends have changed, but my requirements didn’t budge - I still wanted
+the same thing.</p>
 <figure>
-<img src="handmade-blog--build-a-blog-with.png" alt="" /><figcaption>Google search results showing a list of the most popular completions for a phrase “Build a blog with…”</figcaption>
+<img src="handmade-blog--build-a-blog-with.png"
+alt="Google search results showing a list of the most popular completions for a phrase “Build a blog with…”" />
+<figcaption aria-hidden="true">Google search results showing a list of
+the most popular completions for a phrase “Build a blog
+with…”</figcaption>
 </figure>
-<p>At some point, two years ago, I convinced myself to give blogging another try. This time though, I wanted nothing to do with these big blogging platforms or extensible static site generators. I decided to implement something myself. What were my requirements? I knew that each article needed to be defined by a title, description, publication date, and optional modification date. How did I do that, given I wanted to have just a single file per article and it had to be a markdown file? I decided to utilize the reference-style links supported by most of the available Markdown converters - they have the following syntax: <code>[id]: url "title"</code>. The trick was to use an identifier that isn’t referenced anywhere and the shortest, valid URL. The title would be used to store any data I wanted, while the whole line would be ignored by the converter. In the end, I came up with the following structure:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ot">[//]: </span># (TITLE: First Article)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="ot">[//]: </span># (DESCRIPTION: My first article about starting up this beautiful blogging journey!)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="ot">[//]: </span># (DATE: 2019-07-31)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="ot">[//]: </span># (UPDATE DATE: 2019-08-11)</span></code></pre></div>
-<p>Okay, at this point I had a method that allowed me to write articles and attach additional metadata. I decided to focus on templating as the next step. Most of the time, I’m programming in PHP using various frameworks. This time, I decided to take its templating capabilities for a spin and use it to generate some static content. I didn’t want to overcomplicate this thing, so I utilized the <a href="https://www.php.net/manual/en/book.outcontrol.php">output buffering</a> and the <a href="https://www.php.net/manual/en/function.extract">extract</a> function. It’s a very simple pattern that lets you set up the template’s scope and capture the rendered template that normally would be sent back to the client or printed in a console. This method is not secure and doesn’t let you cache anything or prevent the global variables from being leaked into the template, but fortunately, I didn’t have to care about any of that! The rendering would be happening locally, I’d be the only person writing articles, and the whole thing would never be connected to a web server.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">function</span> render_to_string<span class="ot">(</span><span class="kw">string</span> <span class="kw">$template_path</span><span class="ot">,</span> <span class="kw">array</span> <span class="kw">$content</span> = <span class="ot">[])</span>: <span class="kw">string</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>{</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>    <span class="fu">extract</span><span class="ot">(</span><span class="kw">$content</span><span class="ot">);</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>    <span class="fu">ob_start</span><span class="ot">();</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>    <span class="kw">include</span> <span class="kw">$template_path</span><span class="ot">;</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>    <span class="kw">return</span> <span class="fu">ob_get_clean</span><span class="ot">();</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>}</span></code></pre></div>
-<p>What about the actual templates, though? As I said, it’s been covered by PHP itself. Here’s the template responsible for rendering the list of articles, one of which is the one you’re currently reading. Something that normally requires third-party templating engines in other technologies, is handled natively by PHP. Nice!</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">&lt;?php</span> <span class="kw">if</span> <span class="ot">(</span><span class="kw">empty</span><span class="ot">(</span><span class="kw">$articles</span><span class="ot">))</span>: <span class="kw">?&gt;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>    &lt;article&gt;</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>        &lt;section&gt;</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>            No articles available yet.</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>        &lt;/section&gt;</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>    &lt;/article&gt;</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>&lt;<span class="ot">?</span>php <span class="kw">endif</span><span class="ot">;</span> <span class="kw">?&gt;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="kw">&lt;?php</span> <span class="kw">foreach</span><span class="ot">(</span><span class="kw">$articles</span> <span class="kw">as</span> <span class="kw">$article</span><span class="ot">)</span>: <span class="kw">?&gt;</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>    &lt;article id=<span class="st">&quot;&lt;?= </span><span class="kw">$article</span><span class="st">-&gt;id ?&gt;&quot;</span>&gt;</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>        &lt;<span class="fu">header</span>&gt;</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>            &lt;a href=<span class="st">&quot;#&lt;?= </span><span class="kw">$article</span><span class="st">-&gt;id ?&gt;&quot;</span>&gt;</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>                &lt;h2&gt;&lt;<span class="ot">?</span>= <span class="kw">$article</span>-&gt;title <span class="kw">?&gt;</span>&lt;/h2&gt;</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>            &lt;/a&gt;</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>            &lt;small&gt;</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>                from &lt;<span class="fu">time</span> <span class="kw">datetime</span>=<span class="st">&quot;&lt;?= </span><span class="kw">$article</span><span class="st">-&gt;creation_time ?&gt;&quot;</span>&gt;&lt;<span class="ot">?</span>= <span class="kw">$article</span>-&gt;creation_human_time <span class="kw">?&gt;</span>&lt;/<span class="fu">time</span>&gt;</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>            &lt;/small&gt;</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>            &lt;<span class="ot">?</span>php <span class="kw">if</span> <span class="ot">(</span><span class="kw">$article</span>-&gt;update_time<span class="ot">):</span> <span class="kw">?&gt;</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>                &lt;small&gt;<span class="ot">,</span> modified &lt;<span class="fu">time</span> <span class="kw">datetime</span>=<span class="st">&quot;&lt;?= </span><span class="kw">$article</span><span class="st">-&gt;update_time ?&gt;&quot;</span>&gt;&lt;<span class="ot">?</span>= <span class="kw">$article</span>-&gt;update_human_time <span class="kw">?&gt;</span>&lt;/<span class="fu">time</span>&gt;&lt;/small&gt;</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a>            &lt;<span class="ot">?</span>php <span class="kw">endif</span><span class="ot">;</span> <span class="kw">?&gt;</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a>        &lt;/<span class="fu">header</span>&gt;</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a>        &lt;section&gt;</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a>            &lt;<span class="ot">?</span>= <span class="kw">$article</span>-&gt;content <span class="kw">?&gt;</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a>        &lt;/section&gt;</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>    &lt;/article&gt;</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a>&lt;<span class="ot">?</span>php <span class="kw">endfor</span>each<span class="ot">;</span> <span class="kw">?&gt;</span></span></code></pre></div>
-<p>I followed the same approach while implementing the RSS support. Given that RSS is nothing else but a <code>application/rss+xml</code> link in the head section of a page and an XML document listing the articles, adding support for this format was equally trivial. Here’s the whole template that generates <a href="/feed.xml">the RSS feed</a>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">&lt;?</span>xml version=<span class="st">&quot;1.0&quot;</span> <span class="kw">?&gt;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>&lt;rss version=<span class="st">&quot;2.0&quot;</span>&gt;</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>    &lt;channel&gt;</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>        &lt;title&gt;&lt;<span class="ot">?</span>= <span class="kw">$page_title</span> <span class="kw">?&gt;</span>&lt;/title&gt;</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>        &lt;<span class="fu">link</span>&gt;&lt;<span class="ot">?</span>= <span class="kw">$page_url</span> <span class="kw">?&gt;</span>&lt;/<span class="fu">link</span>&gt;</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>        &lt;description&gt;&lt;<span class="ot">?</span>= <span class="kw">$page_description</span> <span class="kw">?&gt;</span>&lt;/description&gt;</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>        &lt;<span class="ot">?</span>php <span class="kw">foreach</span><span class="ot">(</span><span class="kw">$articles</span> <span class="kw">as</span> <span class="kw">$article</span><span class="ot">):</span> <span class="kw">?&gt;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>           &lt;item&gt;</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>               &lt;title&gt;&lt;<span class="ot">?</span>= <span class="kw">$article</span>-&gt;title <span class="kw">?&gt;</span>&lt;/title&gt;</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>               &lt;description&gt;&lt;<span class="ot">?</span>= <span class="kw">$article</span>-&gt;description <span class="kw">?&gt;</span>&lt;/description&gt;</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>               &lt;<span class="fu">link</span>&gt;&lt;<span class="ot">?</span>= <span class="kw">$article</span>-&gt;url <span class="kw">?&gt;</span>&lt;/<span class="fu">link</span>&gt;</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>           &lt;/item&gt;</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>       &lt;<span class="ot">?</span>php <span class="kw">endfor</span>each<span class="ot">;</span> <span class="kw">?&gt;</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>   &lt;/channel&gt;</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>&lt;/rss&gt;</span></code></pre></div>
+<p>At some point, two years ago, I convinced myself to give blogging
+another try. This time though, I wanted nothing to do with these big
+blogging platforms or extensible static site generators. I decided to
+implement something myself. What were my requirements? I knew that each
+article needed to be defined by a title, description, publication date,
+and optional modification date. How did I do that, given I wanted to
+have just a single file per article and it had to be a markdown file? I
+decided to utilize the reference-style links supported by most of the
+available Markdown converters - they have the following syntax:
+<code>[id]: url "title"</code>. The trick was to use an identifier that
+isn’t referenced anywhere and the shortest, valid URL. The title would
+be used to store any data I wanted, while the whole line would be
+ignored by the converter. In the end, I came up with the following
+structure:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ot">[//]: </span># (TITLE: First Article)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ot">[//]: </span># (DESCRIPTION: My first article about starting up this beautiful blogging journey!)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ot">[//]: </span># (DATE: 2019-07-31)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ot">[//]: </span># (UPDATE DATE: 2019-08-11)</span></code></pre></div>
+<p>Okay, at this point I had a method that allowed me to write articles
+and attach additional metadata. I decided to focus on templating as the
+next step. Most of the time, I’m programming in PHP using various
+frameworks. This time, I decided to take its templating capabilities for
+a spin and use it to generate some static content. I didn’t want to
+overcomplicate this thing, so I utilized the <a
+href="https://www.php.net/manual/en/book.outcontrol.php">output
+buffering</a> and the <a
+href="https://www.php.net/manual/en/function.extract">extract</a>
+function. It’s a very simple pattern that lets you set up the template’s
+scope and capture the rendered template that normally would be sent back
+to the client or printed in a console. This method is not secure and
+doesn’t let you cache anything or prevent the global variables from
+being leaked into the template, but fortunately, I didn’t have to care
+about any of that! The rendering would be happening locally, I’d be the
+only person writing articles, and the whole thing would never be
+connected to a web server.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode php"><code class="sourceCode php"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> render_to_string(<span class="dt">string</span> <span class="va">$template_path</span><span class="ot">,</span> <span class="dt">array</span> <span class="va">$content</span> <span class="op">=</span> [])<span class="ot">:</span> <span class="dt">string</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">extract</span>(<span class="va">$content</span>)<span class="ot">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ob_start</span>()<span class="ot">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">include</span> <span class="va">$template_path</span><span class="ot">;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fu">ob_get_clean</span>()<span class="ot">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>What about the actual templates, though? As I said, it’s been covered
+by PHP itself. Here’s the template responsible for rendering the list of
+articles, one of which is the one you’re currently reading. Something
+that normally requires third-party templating engines in other
+technologies, is handled natively by PHP. Nice!</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode php"><code class="sourceCode php"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;?php</span> <span class="cf">if</span> (<span class="kw">empty</span>(<span class="va">$articles</span>))<span class="ot">:</span> <span class="kw">?&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>article<span class="op">&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span>section<span class="op">&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>            <span class="cn">N</span>o articles available yet<span class="op">.</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;/</span>section<span class="op">&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;/</span>article<span class="op">&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="ot">?</span>php <span class="cf">endif</span><span class="ot">;</span> <span class="kw">?&gt;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;?php</span> <span class="cf">foreach</span>(<span class="va">$articles</span> <span class="kw">as</span> <span class="va">$article</span>)<span class="ot">:</span> <span class="kw">?&gt;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>article id<span class="op">=</span><span class="st">&quot;&lt;?= </span><span class="va">$article</span>-&gt;id<span class="st"> ?&gt;&quot;</span><span class="op">&gt;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span><span class="fu">header</span><span class="op">&gt;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>            <span class="op">&lt;</span>a href<span class="op">=</span><span class="st">&quot;#&lt;?= </span><span class="va">$article</span>-&gt;id<span class="st"> ?&gt;&quot;</span><span class="op">&gt;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>                <span class="op">&lt;</span>h2<span class="op">&gt;&lt;</span><span class="ot">?</span><span class="op">=</span> <span class="va">$article</span>-&gt;title <span class="kw">?&gt;</span><span class="op">&lt;/</span>h2<span class="op">&gt;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>            <span class="op">&lt;/</span>a<span class="op">&gt;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>            <span class="op">&lt;</span>small<span class="op">&gt;</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                from <span class="op">&lt;</span><span class="fu">time</span> <span class="bu">datetime</span><span class="op">=</span><span class="st">&quot;&lt;?= </span><span class="va">$article</span>-&gt;creation_time<span class="st"> ?&gt;&quot;</span><span class="op">&gt;&lt;</span><span class="ot">?</span><span class="op">=</span> <span class="va">$article</span>-&gt;creation_human_time <span class="kw">?&gt;</span><span class="op">&lt;/</span><span class="fu">time</span><span class="op">&gt;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>            <span class="op">&lt;/</span>small<span class="op">&gt;</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>            <span class="op">&lt;</span><span class="ot">?</span>php <span class="cf">if</span> (<span class="va">$article</span>-&gt;update_time)<span class="ot">:</span> <span class="kw">?&gt;</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>                <span class="op">&lt;</span>small<span class="op">&gt;</span><span class="ot">,</span> modified <span class="op">&lt;</span><span class="fu">time</span> <span class="bu">datetime</span><span class="op">=</span><span class="st">&quot;&lt;?= </span><span class="va">$article</span>-&gt;update_time<span class="st"> ?&gt;&quot;</span><span class="op">&gt;&lt;</span><span class="ot">?</span><span class="op">=</span> <span class="va">$article</span>-&gt;update_human_time <span class="kw">?&gt;</span><span class="op">&lt;/</span><span class="fu">time</span><span class="op">&gt;&lt;/</span>small<span class="op">&gt;</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>            <span class="op">&lt;</span><span class="ot">?</span>php <span class="cf">endif</span><span class="ot">;</span> <span class="kw">?&gt;</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;/</span><span class="fu">header</span><span class="op">&gt;</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span>section<span class="op">&gt;</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>            <span class="op">&lt;</span><span class="ot">?</span><span class="op">=</span> <span class="va">$article</span>-&gt;content <span class="kw">?&gt;</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;/</span>section<span class="op">&gt;</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;/</span>article<span class="op">&gt;</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span><span class="ot">?</span>php <span class="cf">endforeach</span><span class="ot">;</span> <span class="kw">?&gt;</span></span></code></pre></div>
+<p>I followed the same approach while implementing the RSS support.
+Given that RSS is nothing else but a <code>application/rss+xml</code>
+link in the head section of a page and an XML document listing the
+articles, adding support for this format was equally trivial. Here’s the
+whole template that generates <a href="/feed.xml">the RSS feed</a>.</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode php"><code class="sourceCode php"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;?</span>xml version<span class="op">=</span><span class="st">&quot;1.0&quot;</span> <span class="kw">?&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>rss version<span class="op">=</span><span class="st">&quot;2.0&quot;</span><span class="op">&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>channel<span class="op">&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span>title<span class="op">&gt;&lt;</span><span class="ot">?</span><span class="op">=</span> <span class="va">$page_title</span> <span class="kw">?&gt;</span><span class="op">&lt;/</span>title<span class="op">&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span><span class="fu">link</span><span class="op">&gt;&lt;</span><span class="ot">?</span><span class="op">=</span> <span class="va">$page_url</span> <span class="kw">?&gt;</span><span class="op">&lt;/</span><span class="fu">link</span><span class="op">&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span>description<span class="op">&gt;&lt;</span><span class="ot">?</span><span class="op">=</span> <span class="va">$page_description</span> <span class="kw">?&gt;</span><span class="op">&lt;/</span>description<span class="op">&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span><span class="ot">?</span>php <span class="cf">foreach</span>(<span class="va">$articles</span> <span class="kw">as</span> <span class="va">$article</span>)<span class="ot">:</span> <span class="kw">?&gt;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>           <span class="op">&lt;</span>item<span class="op">&gt;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>               <span class="op">&lt;</span>title<span class="op">&gt;&lt;</span><span class="ot">?</span><span class="op">=</span> <span class="va">$article</span>-&gt;title <span class="kw">?&gt;</span><span class="op">&lt;/</span>title<span class="op">&gt;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>               <span class="op">&lt;</span>description<span class="op">&gt;&lt;</span><span class="ot">?</span><span class="op">=</span> <span class="va">$article</span>-&gt;description <span class="kw">?&gt;</span><span class="op">&lt;/</span>description<span class="op">&gt;</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>               <span class="op">&lt;</span><span class="fu">link</span><span class="op">&gt;&lt;</span><span class="ot">?</span><span class="op">=</span> <span class="va">$article</span>-&gt;url <span class="kw">?&gt;</span><span class="op">&lt;/</span><span class="fu">link</span><span class="op">&gt;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>           <span class="op">&lt;/</span>item<span class="op">&gt;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>       <span class="op">&lt;</span><span class="ot">?</span>php <span class="cf">endforeach</span><span class="ot">;</span> <span class="kw">?&gt;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>   <span class="op">&lt;/</span>channel<span class="op">&gt;</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>rss<span class="op">&gt;</span></span></code></pre></div>
 <figure>
-<img src="handmade-blog--rss.png" alt="" /><figcaption>List of articles formatted as RSS, displayed using the RSSPreview Firefox extension</figcaption>
+<img src="handmade-blog--rss.png"
+alt="List of articles formatted as RSS, displayed using the RSSPreview Firefox extension" />
+<figcaption aria-hidden="true">List of articles formatted as RSS,
+displayed using the RSSPreview Firefox extension</figcaption>
 </figure>
-<p>As for converting the articles into HTML, I decided to use <a href="https://pandoc.org/">pandoc</a>, a swiss-army knife when it comes to converting documents between formats. Here’s the neat part, though. Did you know that pandoc can also syntax highlight code blocks? It utilizes the <a href="https://github.com/jgm/skylighting">skylighting</a> to parse and tag the source code. The result is a build-time highlighted code block, styleable using CSS. I opted for the monochrome theme that uses font weight, instead of colors, to highlight the code. Works great!</p>
-<p>Aside from the above, the rest is handled by the build script. It’s concatenating the stylesheets for inlining, parsing metadata, calling pandoc with each article to generate the HTML, copying over the images used in articles, and generating header identifiers that allow each article to be linked to. It also makes sure the CNAME file is preset as this blog is hosted on GitHub pages with a custom domain.</p>
-<p>That’s it! That’s how this whole thing works. It’s nothing advanced but I’m proud I’ve managed to find a solution that’s bound to reliable software and doesn’t require a whole toolchain to execute. If you want to see the whole picture, <a href="https://github.com/d1823/blog">the source code for this blog</a> is public - feel free to check it out. It’s heavily commented and easy to follow.</p>
+<p>As for converting the articles into HTML, I decided to use <a
+href="https://pandoc.org/">pandoc</a>, a swiss-army knife when it comes
+to converting documents between formats. Here’s the neat part, though.
+Did you know that pandoc can also syntax highlight code blocks? It
+utilizes the <a
+href="https://github.com/jgm/skylighting">skylighting</a> to parse and
+tag the source code. The result is a build-time highlighted code block,
+styleable using CSS. I opted for the monochrome theme that uses font
+weight, instead of colors, to highlight the code. Works great!</p>
+<p>Aside from the above, the rest is handled by the build script. It’s
+concatenating the stylesheets for inlining, parsing metadata, calling
+pandoc with each article to generate the HTML, copying over the images
+used in articles, and generating header identifiers that allow each
+article to be linked to. It also makes sure the CNAME file is present as
+this blog is hosted on GitHub pages with a custom domain.</p>
+<p>That’s it! That’s how this whole thing works. It’s nothing advanced
+but I’m proud I’ve managed to find a solution that’s bound to reliable
+software and doesn’t require a whole toolchain to execute. If you want
+to see the whole picture, <a href="https://github.com/d1823/blog">the
+source code for this blog</a> is public - feel free to check it out.
+It’s heavily commented and easy to follow.</p>
         </section>
     </article>
     <article id="using-entity-repository-as-a-service">
@@ -753,49 +833,124 @@ code span.wa {
             </small>        </header>
 
         <section>
-            <p>If you’re using Symfony, you’ve definitely written a Doctrine repository at some point. If you’ve been using Symfony long enough, you’ve probably seen the introduction of <em>ServiceEntityRepository</em> that complemented the default <em>EntityRepository</em> base class. Its initial goal was to ease the use of repositories with service containers, instead of being tied directly to Doctrine, but that’s not what I want to talk about. I really want to talk about the implications of using the <em>EntityRepository</em> in a project, where every other repository extends the <em>ServiceEntityRepository</em>.</p>
-<p>During a bug-fixing-technical-debt-reducing period in one of the projects I’m working on, I decided to take a look at a long-standing issue that was popping up in logs from time to time. It wasn’t anything critical as the crash was happening in the context of Symfony’s message consumer in the Messenger component, but the handler run often enough to eventually do what it was supposed to do. The exception we’ve been getting was “Entity manager is closed” thrown by Doctrine. It wasn’t apparent why it was thrown in the first place, because none of the operations executed by Doctrine, before this exception, failed in any way.</p>
-<p>I’ve spent hours verifying the database schema and various input sets while trying to reproduce the crash locally. Eventually, I decided to look at it in a broader context - the handler was executed by a long-running consumer. It became apparent that the reason for throwing that exception might’ve originated from a different part of the code that wasn’t part of the executions paths under the affected handler. I looked at logs preceding the crash and noticed a pattern where it would only throw an exception if a previously consumed message resulted in the Doctrine exception as well.</p>
-<p>I was on the right track. At this point, I knew that the entity manager was being closed because of an exception thrown by a different handler processing a previous message. One question remained - why wasn’t Doctrine reset to its original state before consuming a new message? After all, Messenger handles it implicitly through the <a href="https://github.com/symfony/doctrine-bridge/blob/5.4/Messenger/DoctrinePingConnectionMiddleware.php"><em>DoctrinePingConnectionMiddleware</em></a> - it resets the manager before passing the execution to the rest of the middleware stack.</p>
-<p>Here’s where the topic of this article comes to light. It’s because of the difference between the constructors of <em>EntityRepository</em> and <em>ServiceEntityRepository</em>. Let’s take a look at both of these:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">class</span> EntityRepository <span class="kw">implements</span> ObjectRepository<span class="ot">,</span> Selectable</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>{</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    <span class="kw">public</span> <span class="kw">function</span> <span class="fu">__construct</span><span class="ot">(</span>EntityManagerInterface <span class="kw">$em</span><span class="ot">,</span> ClassMetadata <span class="kw">$class</span><span class="ot">)</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>    {</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>        <span class="kw">$this</span>-&gt;_entityName = <span class="kw">$class</span>-&gt;name<span class="ot">;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>        <span class="kw">$this</span>-&gt;_em         = <span class="kw">$em</span><span class="ot">;</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>        <span class="kw">$this</span>-&gt;_class      = <span class="kw">$class</span><span class="ot">;</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>    }</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>}</span></code></pre></div>
-<div class="sourceCode" id="cb2"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">class</span> ServiceEntityRepository <span class="kw">extends</span> EntityRepository <span class="kw">implements</span> ServiceEntityRepositoryInterface</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>{</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>    <span class="kw">public</span> <span class="kw">function</span> <span class="fu">__construct</span><span class="ot">(</span>ManagerRegistry <span class="kw">$registry</span><span class="ot">,</span> <span class="kw">string</span> <span class="kw">$entityClass</span><span class="ot">)</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>    {</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>        <span class="kw">$manager</span> = <span class="kw">$registry</span>-&gt;getManagerForClass<span class="ot">(</span><span class="kw">$entityClass</span><span class="ot">);</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>        <span class="kw">if</span> <span class="ot">(</span><span class="kw">$manager</span> === <span class="kw">null</span><span class="ot">)</span> {</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>            <span class="kw">throw</span> <span class="kw">new</span> <span class="kw">LogicException</span><span class="ot">(</span><span class="fu">sprintf</span><span class="ot">(</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>                <span class="st">&#39;Could not find the entity manager for class &quot;%s&quot;. Check your Doctrine configuration to make sure it is configured to load this entity’s metadata.&#39;</span><span class="ot">,</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>                <span class="kw">$entityClass</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>            <span class="ot">));</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>        }</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>        parent::<span class="fu">__construct</span><span class="ot">(</span><span class="kw">$manager</span><span class="ot">,</span> <span class="kw">$manager</span>-&gt;getClassMetadata<span class="ot">(</span><span class="kw">$entityClass</span><span class="ot">));</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>    }</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a>}</span></code></pre></div>
-<p>We can immediately notice two things - first, the <em>ServiceEntityRepository</em> is extending the <em>EntityRepository</em>; second, in contrast to its parent, <em>ServiceEntityRepository</em> isn’t constructed with an object implementing the <em>EntityManagerInterface</em>, but with an instance of <em>ManagerRegistry</em> instead. What’s the difference?</p>
-<p>When an <em>EntityManager</em> encounters a driver exception during the <em>flush</em> operation, it’s going to close. You won’t be able to use this instance anymore as there’s no way to make it reopen. By extension, all instances of repositories using that exact instance of <em>EntityManager</em> will become useless. You can, of course, reach the <em>ManagerRegistry</em> and call the <em>resetManager</em> method, but that won’t fix anything, aside from giving you a fresh instance <em>EntityManager</em>. With <em>ServiceEntityRepository</em> it’s a different story. Symfony implements its own <em>ManagerRegistry</em> that knows how to talk to a PSR’s <em>ContainerInterface</em> and the <em>EntityManager</em> returned by the <em>ManagerRegistry::getManagerForClass</em> method is a proxy! When such <em>ManagerRegistry</em> is asked for a fresh <em>EntityManager</em>, it doesn’t only construct a new one, it updates that same proxy with a fresh, connected instance. That way, when you reset the manager as part of your exception-handling procedure, this change is propagated throughout the system.</p>
-<p>With all that, let’s come back to my original issue. At this point, we understand that the <em>EntityManager</em> should’ve been reset before handling a new message, but it wasn’t. When I took a look at the affected repository one more time, I noticed the issue. It was extending the <em>EntityRepository</em>, not the <em>ServiceEntityRepository</em>! When the messenger’s middleware reset the manager, that repository wasn’t affected by that change! The first <em>flush</em> operation had to fail because it was using an obsolete entity manager.</p>
-<p>At this point, you might be a little confused. Didn’t I just say that <em>ServiceEntityRepository</em> constructs itself with a proxy to <em>EntityManager</em>? How am I sure it’s not the same with Doctrine’s <em>EntityManager</em>? It’s because of its service definition and how it’s fetched from the service container. If you take a look at the <a href="https://github.com/doctrine/DoctrineBundle/blob/2.8.x/DependencyInjection/DoctrineExtension.php"><em>DependencyInjection\DoctrineExtension</em></a>, you’ll notice that every configured entity manager is a service.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">$container</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>    -&gt;setDefinition<span class="ot">(</span><span class="kw">$entityManagerId</span><span class="ot">,</span> <span class="kw">new</span> ChildDefinition<span class="ot">(</span><span class="st">&#39;doctrine.orm.entity_manager.abstract&#39;</span><span class="ot">))</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>    -&gt;setPublic<span class="ot">(</span><span class="kw">true</span><span class="ot">)</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>    -&gt;setArguments<span class="ot">([</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>        <span class="kw">new</span> Reference<span class="ot">(</span><span class="fu">sprintf</span><span class="ot">(</span><span class="st">&#39;doctrine.dbal.%s_connection&#39;</span><span class="ot">,</span> <span class="kw">$entityManager</span><span class="ot">[</span><span class="st">&#39;connection&#39;</span><span class="ot">])),</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>        <span class="kw">new</span> Reference<span class="ot">(</span><span class="fu">sprintf</span><span class="ot">(</span><span class="st">&#39;doctrine.orm.%s_configuration&#39;</span><span class="ot">,</span> <span class="kw">$entityManager</span><span class="ot">[</span><span class="st">&#39;name&#39;</span><span class="ot">])),</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>    <span class="ot">])</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>    -&gt;setConfigurator<span class="ot">([</span><span class="kw">new</span> Reference<span class="ot">(</span><span class="kw">$managerConfiguratorName</span><span class="ot">),</span> <span class="st">&#39;configure&#39;</span><span class="ot">]);</span></span></code></pre></div>
-<p>Additionally, since the <em>EntityManagerInterface</em> is an alias to the <em>default_entity_manager</em>, you can be sure that when injected directly, it won’t be a proxy.</p>
+            <p>If you’re using Symfony, you’ve definitely written a Doctrine
+repository at some point. If you’ve been using Symfony long enough,
+you’ve probably seen the introduction of
+<em>ServiceEntityRepository</em> that complemented the default
+<em>EntityRepository</em> base class. Its initial goal was to ease the
+use of repositories with service containers, instead of being tied
+directly to Doctrine, but that’s not what I want to talk about. I really
+want to talk about the implications of using the
+<em>EntityRepository</em> in a project, where every other repository
+extends the <em>ServiceEntityRepository</em>.</p>
+<p>During a bug-fixing-technical-debt-reducing period in one of the
+projects I’m working on, I decided to take a look at a long-standing
+issue that was popping up in logs from time to time. It wasn’t anything
+critical as the crash was happening in the context of Symfony’s message
+consumer in the Messenger component, but the handler run often enough to
+eventually do what it was supposed to do. The exception we’ve been
+getting was “Entity manager is closed” thrown by Doctrine. It wasn’t
+apparent why it was thrown in the first place, because none of the
+operations executed by Doctrine, before this exception, failed in any
+way.</p>
+<p>I’ve spent hours verifying the database schema and various input sets
+while trying to reproduce the crash locally. Eventually, I decided to
+look at it in a broader context - the handler was executed by a
+long-running consumer. It became apparent that the reason for throwing
+that exception might’ve originated from a different part of the code
+that wasn’t part of the executions paths under the affected handler. I
+looked at logs preceding the crash and noticed a pattern where it would
+only throw an exception if a previously consumed message resulted in the
+Doctrine exception as well.</p>
+<p>I was on the right track. At this point, I knew that the entity
+manager was being closed because of an exception thrown by a different
+handler processing a previous message. One question remained - why
+wasn’t Doctrine reset to its original state before consuming a new
+message? After all, Messenger handles it implicitly through the <a
+href="https://github.com/symfony/doctrine-bridge/blob/5.4/Messenger/DoctrinePingConnectionMiddleware.php"><em>DoctrinePingConnectionMiddleware</em></a>
+- it resets the manager before passing the execution to the rest of the
+middleware stack.</p>
+<p>Here’s where the topic of this article comes to light. It’s because
+of the difference between the constructors of <em>EntityRepository</em>
+and <em>ServiceEntityRepository</em>. Let’s take a look at both of
+these:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode php"><code class="sourceCode php"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="cn">E</span>ntityRepository <span class="kw">implements</span> <span class="cn">O</span>bjectRepository<span class="ot">,</span> <span class="cn">S</span>electable</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="kw">function</span> <span class="bu">__construct</span>(<span class="cn">E</span>ntityManagerInterface <span class="va">$em</span><span class="ot">,</span> <span class="cn">C</span>lassMetadata <span class="va">$class</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">$this</span>-&gt;<span class="cn">_</span>entityName <span class="op">=</span> <span class="va">$class</span>-&gt;name<span class="ot">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">$this</span>-&gt;<span class="cn">_</span>em         <span class="op">=</span> <span class="va">$em</span><span class="ot">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">$this</span>-&gt;<span class="cn">_</span>class      <span class="op">=</span> <span class="va">$class</span><span class="ot">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode php"><code class="sourceCode php"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="cn">S</span>erviceEntityRepository <span class="kw">extends</span> <span class="cn">E</span>ntityRepository <span class="kw">implements</span> <span class="cn">S</span>erviceEntityRepositoryInterface</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="kw">function</span> <span class="bu">__construct</span>(<span class="cn">M</span>anagerRegistry <span class="va">$registry</span><span class="ot">,</span> <span class="dt">string</span> <span class="va">$entityClass</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">$manager</span> <span class="op">=</span> <span class="va">$registry</span>-&gt;getManagerForClass(<span class="va">$entityClass</span>)<span class="ot">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="va">$manager</span> <span class="op">===</span> <span class="kw">null</span>) {</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">LogicException</span>(<span class="fu">sprintf</span>(</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                <span class="st">&#39;Could not find the entity manager for class &quot;%s&quot;. Check your Doctrine configuration to make sure it is configured to load this entity’s metadata.&#39;</span><span class="ot">,</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                <span class="va">$entityClass</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            ))<span class="ot">;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="kw">parent</span>::<span class="bu">__construct</span>(<span class="va">$manager</span><span class="ot">,</span> <span class="va">$manager</span>-&gt;getClassMetadata(<span class="va">$entityClass</span>))<span class="ot">;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>We can immediately notice two things - first, the
+<em>ServiceEntityRepository</em> is extending the
+<em>EntityRepository</em>; second, in contrast to its parent,
+<em>ServiceEntityRepository</em> isn’t constructed with an object
+implementing the <em>EntityManagerInterface</em>, but with an instance
+of <em>ManagerRegistry</em> instead. What’s the difference?</p>
+<p>When an <em>EntityManager</em> encounters a driver exception during
+the <em>flush</em> operation, it’s going to close. You won’t be able to
+use this instance anymore as there’s no way to make it reopen. By
+extension, all instances of repositories using that exact instance of
+<em>EntityManager</em> will become useless. You can, of course, reach
+the <em>ManagerRegistry</em> and call the <em>resetManager</em> method,
+but that won’t fix anything, aside from giving you a fresh instance
+<em>EntityManager</em>. With <em>ServiceEntityRepository</em> it’s a
+different story. Symfony implements its own <em>ManagerRegistry</em>
+that knows how to talk to a PSR’s <em>ContainerInterface</em> and the
+<em>EntityManager</em> returned by the
+<em>ManagerRegistry::getManagerForClass</em> method is a proxy! When
+such <em>ManagerRegistry</em> is asked for a fresh
+<em>EntityManager</em>, it doesn’t only construct a new one, it updates
+that same proxy with a fresh, connected instance. That way, when you
+reset the manager as part of your exception-handling procedure, this
+change is propagated throughout the system.</p>
+<p>With all that, let’s come back to my original issue. At this point,
+we understand that the <em>EntityManager</em> should’ve been reset
+before handling a new message, but it wasn’t. When I took a look at the
+affected repository one more time, I noticed the issue. It was extending
+the <em>EntityRepository</em>, not the <em>ServiceEntityRepository</em>!
+When the messenger’s middleware reset the manager, that repository
+wasn’t affected by that change! The first <em>flush</em> operation had
+to fail because it was using an obsolete entity manager.</p>
+<p>At this point, you might be a little confused. Didn’t I just say that
+<em>ServiceEntityRepository</em> constructs itself with a proxy to
+<em>EntityManager</em>? How am I sure it’s not the same with Doctrine’s
+<em>EntityManager</em>? It’s because of its service definition and how
+it’s fetched from the service container. If you take a look at the <a
+href="https://github.com/doctrine/DoctrineBundle/blob/2.8.x/DependencyInjection/DoctrineExtension.php"><em>DependencyInjection\DoctrineExtension</em></a>,
+you’ll notice that every configured entity manager is a service.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode php"><code class="sourceCode php"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">$container</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    -&gt;setDefinition(<span class="va">$entityManagerId</span><span class="ot">,</span> <span class="kw">new</span> <span class="cn">C</span>hildDefinition(<span class="st">&#39;doctrine.orm.entity_manager.abstract&#39;</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    -&gt;setPublic(<span class="kw">true</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    -&gt;setArguments([</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">new</span> <span class="cn">R</span>eference(<span class="fu">sprintf</span>(<span class="st">&#39;doctrine.dbal.%s_connection&#39;</span><span class="ot">,</span> <span class="va">$entityManager</span>[<span class="st">&#39;connection&#39;</span>]))<span class="ot">,</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">new</span> <span class="cn">R</span>eference(<span class="fu">sprintf</span>(<span class="st">&#39;doctrine.orm.%s_configuration&#39;</span><span class="ot">,</span> <span class="va">$entityManager</span>[<span class="st">&#39;name&#39;</span>]))<span class="ot">,</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    -&gt;setConfigurator([<span class="kw">new</span> <span class="cn">R</span>eference(<span class="va">$managerConfiguratorName</span>)<span class="ot">,</span> <span class="st">&#39;configure&#39;</span>])<span class="ot">;</span></span></code></pre></div>
+<p>Additionally, since the <em>EntityManagerInterface</em> is an alias
+to the <em>default_entity_manager</em>, you can be sure that when
+injected directly, it won’t be a proxy.</p>
 <pre><code>Information for Service &quot;doctrine.orm.default_entity_manager&quot;
 =============================================================
 
@@ -817,7 +972,13 @@ code span.wa {
   Factory Class    Doctrine\ORM\EntityManager                                
   Factory Method   create                                                    
  ---------------- ----------------------------------------------------------</code></pre>
-<p>My takeaway from this case is to never use the <em>EntityManagerInterface</em> as a direct dependency. I even went as far as writing a PHPStan extension that forbids it. There are no legitimate cases that I can’t think of that would require it, and the bugs caused by incorrect usage are really hard to track. I can’t tell you what to do, but as for me - I’m adding this thing to my list of “must-do” things while working on Symfony codebases.</p>
+<p>My takeaway from this case is to never use the
+<em>EntityManagerInterface</em> as a direct dependency. I even went as
+far as writing a PHPStan extension that forbids it. There are no
+legitimate cases that I can’t think of that would require it, and the
+bugs caused by incorrect usage are really hard to track. I can’t tell
+you what to do, but as for me - I’m adding this thing to my list of
+“must-do” things while working on Symfony codebases.</p>
         </section>
     </article>
     <article id="changing-brightness-and-contrast-using-application-launcher">
@@ -834,122 +995,170 @@ code span.wa {
                     </header>
 
         <section>
-            <p>In the article <a href="#controlling-my-screen-using-mccs">Controlling my screen using MCCS</a> I’ve shown how to use ddcutil to change both contrast and brightness of your monitor without touching its physical controls. Here, I want to show you how I got it hooked with Pop!_OS (or any DE, really) application launcher for ease of use.</p>
-<p>Most Desktop Environments allow the user to quickly launch an application by showing a launcher. Whether it’s something similiar to macOS’s Spotlight, or Windows’s Menu Start, it will allow you to launch a new application with just a few keystrokes.</p>
-<p>On Linux, as many of you probably already know, the entries shown by that launcher are stored in one of the directories listed in <code>$XDG_DATA_DIRS</code> as defined by the <a href="https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html">XDG Desktop Entry specification</a>. Each of these directories contain files with <code>.desktop</code> extension. If you’d open one of them, you’d find the content is something like this:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode ini"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">[Desktop Entry]</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="dt">Version</span><span class="ot">=</span><span class="fl">1.0</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="dt">Name</span><span class="ot">=</span><span class="st">Firefox Web Browser</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="dt">Comment</span><span class="ot">=</span><span class="st">Browse the World Wide Web</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="dt">GenericName</span><span class="ot">=</span><span class="st">Web Browser</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="dt">Keywords</span><span class="ot">=</span><span class="st">Internet;WWW;Browser;Web;Explorer</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="dt">Exec</span><span class="ot">=</span><span class="st">firefox %u</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="dt">Terminal</span><span class="ot">=</span><span class="kw">false</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="dt">X-MultipleArgs</span><span class="ot">=</span><span class="kw">false</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="dt">Type</span><span class="ot">=</span><span class="st">Application</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="dt">Icon</span><span class="ot">=</span><span class="st">firefox</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="dt">Categories</span><span class="ot">=</span><span class="st">GNOME;GTK;Network;WebBrowser;</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="dt">MimeType</span><span class="ot">=</span><span class="st">text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;x-scheme-handler/chrome;video/webm;application/x-xpinstall;</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="dt">StartupNotify</span><span class="ot">=</span><span class="kw">true</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="dt">Actions</span><span class="ot">=</span><span class="st">new-window;new-private-window;</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="kw">[Desktop Action new-window]</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="dt">Name</span><span class="ot">=</span><span class="st">Open a New Window</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="dt">Exec</span><span class="ot">=</span><span class="st">firefox -new-window</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="kw">[Desktop Action new-private-window]</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="dt">Name</span><span class="ot">=</span><span class="st">Open a New Private Window</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a><span class="dt">Exec</span><span class="ot">=</span><span class="st">firefox -private-window</span></span></code></pre></div>
-<p>All of the above is nothing else but a specification to what should happen, when the XDG compliant program tries to analyze one of these files. It’ll find fields like name, keywords, the path to the binary/command string or an icon.</p>
-<p>My idea was to create a Desktop file for each of the brightness and contrast levels I wanted my monitor to be set to. I’ve decided to keep these two properties set to the same level, because that’s how I got the best results in my case, although YMMV. In my case, given both properties are ranged from 0 to 100, the following levels were setup: Darker (40), Dark (45), Dimmer (50), Dim (57), Default (65), Light (70), Lighter (80). The number of levels and the values are the result of day to day usage. Initially started with three or four, but found out that they didn’t fit well enough on some days as the screen was either too bright or too dim.</p>
-<p>I also decided I don’t want to keep these values in Desktop files directly. Over the years, I’ve found the hard way that keeping these kinds of settings outside of my VCS backed configuration is a bad idea. That’s how I created this little utility called <code>displaymgr</code> which is nothing else but a simple shell script.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co">#!/usr/bin/env bash</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">if</span><span class="bu"> [</span> <span class="st">&quot;</span><span class="va">$EUID</span><span class="st">&quot;</span> <span class="ot">-ne</span> 0<span class="bu"> ]</span>; <span class="kw">then</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>  <span class="bu">echo</span> <span class="st">&quot;Please run with elevated privileges.&quot;</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>  <span class="bu">exit</span> 1</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="kw">fi</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="va">PACKAGE=$(</span><span class="fu">basename</span> <span class="st">&quot;</span><span class="va">$0</span><span class="st">&quot;</span><span class="va">)</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="kw">function</span><span class="fu"> print_help()</span> <span class="kw">{</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a>  <span class="bu">echo</span> <span class="st">&quot;Usage: ./</span><span class="va">$PACKAGE</span><span class="st"> &lt;preset&gt;&quot;</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>  <span class="bu">echo</span> <span class="st">&quot;A small utility that allows to control the display supporting MCCS procotol.&quot;</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>  <span class="bu">echo</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a>  <span class="bu">echo</span> <span class="st">&quot;Arguments:&quot;</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>  <span class="bu">echo</span> <span class="st">&quot;  preset              Can be darker, dark, dimmer, dim, default, light or lighter.&quot;</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="kw">}</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a><span class="va">BRIGHTNESS_VCP=</span>10</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a><span class="va">CONTRAST_VCP=</span>12</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a><span class="va">PRESET_DARKER=</span>40</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a><span class="va">PRESET_DARK=</span>45</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a><span class="va">PRESET_DIMMER=</span>50</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a><span class="va">PRESET_DIM=</span>57</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a><span class="va">PRESET_DEFAULT=</span>65</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a><span class="va">PRESET_LIGHT=</span>75</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a><span class="va">PRESET_LIGHTER=</span>80</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a><span class="va">CHOSEN_PRESET=</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true"></a></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true"></a><span class="kw">while</span> <span class="bu">test</span> <span class="va">$#</span> -gt 0<span class="kw">;</span> <span class="kw">do</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true"></a>  <span class="kw">case</span> <span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span><span class="kw"> in</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true"></a>    darker<span class="kw">)</span></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_DARKER</span><span class="st">&quot;</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true"></a>      <span class="bu">shift</span></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true"></a>      <span class="kw">;;</span></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true"></a>    dark<span class="kw">)</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_DARK</span><span class="st">&quot;</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true"></a>      <span class="bu">shift</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true"></a>      <span class="kw">;;</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true"></a>    dimmer<span class="kw">)</span></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_DIMMER</span><span class="st">&quot;</span></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true"></a>      <span class="bu">shift</span></span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true"></a>      <span class="kw">;;</span></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true"></a>    dim<span class="kw">)</span></span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_DIM</span><span class="st">&quot;</span></span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true"></a>      <span class="bu">shift</span></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true"></a>      <span class="kw">;;</span></span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true"></a>    default<span class="kw">)</span></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_DEFAULT</span><span class="st">&quot;</span></span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true"></a>      <span class="bu">shift</span></span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true"></a>      <span class="kw">;;</span></span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true"></a>    light<span class="kw">)</span></span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_LIGHT</span><span class="st">&quot;</span></span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true"></a>      <span class="bu">shift</span></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true"></a>      <span class="kw">;;</span></span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true"></a>    lighter<span class="kw">)</span></span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true"></a>      <span class="va">CHOSEN_PRESET=</span><span class="st">&quot;</span><span class="va">$PRESET_LIGHTER</span><span class="st">&quot;</span></span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true"></a>      <span class="bu">shift</span></span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true"></a>      <span class="kw">;;</span></span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true"></a>    *<span class="kw">)</span></span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true"></a>      <span class="bu">break</span></span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true"></a>      <span class="kw">;;</span></span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true"></a>  <span class="kw">esac</span></span>
-<span id="cb2-65"><a href="#cb2-65" aria-hidden="true"></a><span class="kw">done</span></span>
-<span id="cb2-66"><a href="#cb2-66" aria-hidden="true"></a></span>
-<span id="cb2-67"><a href="#cb2-67" aria-hidden="true"></a><span class="kw">if</span><span class="bu"> [</span> <span class="ot">-z</span> <span class="st">&quot;</span><span class="va">$CHOSEN_PRESET</span><span class="st">&quot;</span><span class="bu"> ]</span>; <span class="kw">then</span></span>
-<span id="cb2-68"><a href="#cb2-68" aria-hidden="true"></a>  <span class="ex">print_help</span></span>
-<span id="cb2-69"><a href="#cb2-69" aria-hidden="true"></a>  <span class="bu">exit</span> 1</span>
-<span id="cb2-70"><a href="#cb2-70" aria-hidden="true"></a><span class="kw">fi</span></span>
-<span id="cb2-71"><a href="#cb2-71" aria-hidden="true"></a></span>
-<span id="cb2-72"><a href="#cb2-72" aria-hidden="true"></a><span class="ex">/usr/bin/ddcutil</span> setvcp <span class="st">&quot;</span><span class="va">$BRIGHTNESS_VCP</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$CHOSEN_PRESET</span><span class="st">&quot;</span></span>
-<span id="cb2-73"><a href="#cb2-73" aria-hidden="true"></a><span class="ex">/usr/bin/ddcutil</span> setvcp <span class="st">&quot;</span><span class="va">$CONTRAST_VCP</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$CHOSEN_PRESET</span><span class="st">&quot;</span></span></code></pre></div>
-<p>First and foremost, it can be used directly from the CLI. Invoking <code>$ sudo displaymgr default</code> will set my monitor’s brightness and contrast to 66. Knowing it works on the commandline, I created the corresponding Desktop files. All of them share the same structure, while the preset name is the only difference.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode ini"><code class="sourceCode ini"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">[Desktop Entry]</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="dt">Name</span><span class="ot">=</span><span class="st">Brightness: </span><span class="kw">Default</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="dt">TryExec</span><span class="ot">=</span><span class="st">displaymgr</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="dt">Exec</span><span class="ot">=</span><span class="st">sudo displaymgr </span><span class="kw">default</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="dt">Type</span><span class="ot">=</span><span class="st">Application</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="dt">Icon</span><span class="ot">=</span><span class="st">display-brightness-symbolic</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="dt">Keywords</span><span class="ot">=</span><span class="st">display;brightness;</span><span class="kw">default</span><span class="st">;reset;standard;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="dt">Categories</span><span class="ot">=</span><span class="st">Utility;</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="dt">StartupNotify</span><span class="ot">=</span><span class="kw">false</span></span></code></pre></div>
-<p>The last remaining thing is to make the displaymgr runnable without providing the password. To do that, execute <code>$ sudo visudo /etc/sudoers.d/displaymgr</code> and save it with the following content: <code>ALL ALL = NOPASSWD:/usr/bin/displaymgr</code>.</p>
-<p>With all of that done, I was now able to control the brightness and contrast of my monitor just as easily as launching an application.</p>
+            <p>In the article <a
+href="#controlling-my-screen-using-mccs">Controlling my screen using
+MCCS</a> I’ve shown how to use ddcutil to change both contrast and
+brightness of your monitor without touching its physical controls. Here,
+I want to show you how I got it hooked with Pop!_OS (or any DE, really)
+application launcher for ease of use.</p>
+<p>Most Desktop Environments allow the user to quickly launch an
+application by showing a launcher. Whether it’s something similiar to
+macOS’s Spotlight, or Windows’s Menu Start, it will allow you to launch
+a new application with just a few keystrokes.</p>
+<p>On Linux, as many of you probably already know, the entries shown by
+that launcher are stored in one of the directories listed in
+<code>$XDG_DATA_DIRS</code> as defined by the <a
+href="https://specifications.freedesktop.org/desktop-entry-spec/desktop-entry-spec-latest.html">XDG
+Desktop Entry specification</a>. Each of these directories contain files
+with <code>.desktop</code> extension. If you’d open one of them, you’d
+find the content is something like this:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode ini"><code class="sourceCode ini"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[Desktop Entry]</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Version</span><span class="ot">=</span><span class="fl">1.0</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="dt">Name</span><span class="ot">=</span><span class="st">Firefox Web Browser</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Comment</span><span class="ot">=</span><span class="st">Browse the World Wide Web</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">GenericName</span><span class="ot">=</span><span class="st">Web Browser</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Keywords</span><span class="ot">=</span><span class="st">Internet;WWW;Browser;Web;Explorer</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="dt">Exec</span><span class="ot">=</span><span class="st">firefox %u</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="dt">Terminal</span><span class="ot">=</span><span class="kw">false</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="dt">X-MultipleArgs</span><span class="ot">=</span><span class="kw">false</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="dt">Type</span><span class="ot">=</span><span class="st">Application</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="dt">Icon</span><span class="ot">=</span><span class="st">firefox</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="dt">Categories</span><span class="ot">=</span><span class="st">GNOME;GTK;Network;WebBrowser;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="dt">MimeType</span><span class="ot">=</span><span class="st">text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;x-scheme-handler/chrome;video/webm;application/x-xpinstall;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="dt">StartupNotify</span><span class="ot">=</span><span class="kw">true</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="dt">Actions</span><span class="ot">=</span><span class="st">new-window;new-private-window;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="kw">[Desktop Action new-window]</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="dt">Name</span><span class="ot">=</span><span class="st">Open a New Window</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="dt">Exec</span><span class="ot">=</span><span class="st">firefox -new-window</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="kw">[Desktop Action new-private-window]</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="dt">Name</span><span class="ot">=</span><span class="st">Open a New Private Window</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="dt">Exec</span><span class="ot">=</span><span class="st">firefox -private-window</span></span></code></pre></div>
+<p>All of the above is nothing else but a specification to what should
+happen, when the XDG compliant program tries to analyze one of these
+files. It’ll find fields like name, keywords, the path to the
+binary/command string or an icon.</p>
+<p>My idea was to create a Desktop file for each of the brightness and
+contrast levels I wanted my monitor to be set to. I’ve decided to keep
+these two properties set to the same level, because that’s how I got the
+best results in my case, although YMMV. In my case, given both
+properties are ranged from 0 to 100, the following levels were setup:
+Darker (40), Dark (45), Dimmer (50), Dim (57), Default (65), Light (70),
+Lighter (80). The number of levels and the values are the result of day
+to day usage. Initially started with three or four, but found out that
+they didn’t fit well enough on some days as the screen was either too
+bright or too dim.</p>
+<p>I also decided I don’t want to keep these values in Desktop files
+directly. Over the years, I’ve found the hard way that keeping these
+kinds of settings outside of my VCS backed configuration is a bad idea.
+That’s how I created this little utility called <code>displaymgr</code>
+which is nothing else but a simple shell script.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="st">&quot;</span><span class="va">$EUID</span><span class="st">&quot;</span> <span class="ot">-ne</span> 0 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Please run with elevated privileges.&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="va">PACKAGE</span><span class="op">=</span><span class="va">$(</span><span class="fu">basename</span> <span class="st">&quot;</span><span class="va">$0</span><span class="st">&quot;</span><span class="va">)</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span><span class="fu"> print_help()</span> <span class="kw">{</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Usage: ./</span><span class="va">$PACKAGE</span><span class="st"> &lt;preset&gt;&quot;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;A small utility that allows to control the display supporting MCCS procotol.&quot;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;Arguments:&quot;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="bu">echo</span> <span class="st">&quot;  preset              Can be darker, dark, dimmer, dim, default, light or lighter.&quot;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="va">BRIGHTNESS_VCP</span><span class="op">=</span>10</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="va">CONTRAST_VCP</span><span class="op">=</span>12</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="va">PRESET_DARKER</span><span class="op">=</span>40</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="va">PRESET_DARK</span><span class="op">=</span>45</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="va">PRESET_DIMMER</span><span class="op">=</span>50</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="va">PRESET_DIM</span><span class="op">=</span>57</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="va">PRESET_DEFAULT</span><span class="op">=</span>65</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="va">PRESET_LIGHT</span><span class="op">=</span>75</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="va">PRESET_LIGHTER</span><span class="op">=</span>80</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="va">CHOSEN_PRESET</span><span class="op">=</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="bu">test</span> <span class="va">$#</span> <span class="at">-gt</span> 0<span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  <span class="cf">case</span> <span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span> <span class="kw">in</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="ss">darker</span><span class="kw">)</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>      <span class="va">CHOSEN_PRESET</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$PRESET_DARKER</span><span class="st">&quot;</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>      <span class="bu">shift</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>      <span class="cf">;;</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="ss">dark</span><span class="kw">)</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>      <span class="va">CHOSEN_PRESET</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$PRESET_DARK</span><span class="st">&quot;</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>      <span class="bu">shift</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>      <span class="cf">;;</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="ss">dimmer</span><span class="kw">)</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>      <span class="va">CHOSEN_PRESET</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$PRESET_DIMMER</span><span class="st">&quot;</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>      <span class="bu">shift</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>      <span class="cf">;;</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="ss">dim</span><span class="kw">)</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>      <span class="va">CHOSEN_PRESET</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$PRESET_DIM</span><span class="st">&quot;</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>      <span class="bu">shift</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>      <span class="cf">;;</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    <span class="ss">default</span><span class="kw">)</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>      <span class="va">CHOSEN_PRESET</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$PRESET_DEFAULT</span><span class="st">&quot;</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>      <span class="bu">shift</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>      <span class="cf">;;</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    <span class="ss">light</span><span class="kw">)</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>      <span class="va">CHOSEN_PRESET</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$PRESET_LIGHT</span><span class="st">&quot;</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>      <span class="bu">shift</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>      <span class="cf">;;</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    <span class="ss">lighter</span><span class="kw">)</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>      <span class="va">CHOSEN_PRESET</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$PRESET_LIGHTER</span><span class="st">&quot;</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>      <span class="bu">shift</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>      <span class="cf">;;</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    <span class="pp">*</span><span class="kw">)</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>      <span class="cf">break</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>      <span class="cf">;;</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>  <span class="cf">esac</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">-z</span> <span class="st">&quot;</span><span class="va">$CHOSEN_PRESET</span><span class="st">&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>  <span class="ex">print_help</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>  <span class="bu">exit</span> 1</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/bin/ddcutil</span> setvcp <span class="st">&quot;</span><span class="va">$BRIGHTNESS_VCP</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$CHOSEN_PRESET</span><span class="st">&quot;</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/bin/ddcutil</span> setvcp <span class="st">&quot;</span><span class="va">$CONTRAST_VCP</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$CHOSEN_PRESET</span><span class="st">&quot;</span></span></code></pre></div>
+<p>First and foremost, it can be used directly from the CLI. Invoking
+<code>$ sudo displaymgr default</code> will set my monitor’s brightness
+and contrast to 66. Knowing it works on the commandline, I created the
+corresponding Desktop files. All of them share the same structure, while
+the preset name is the only difference.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode ini"><code class="sourceCode ini"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[Desktop Entry]</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dt">Name</span><span class="ot">=</span><span class="st">Brightness: Default</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dt">TryExec</span><span class="ot">=</span><span class="st">displaymgr</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dt">Exec</span><span class="ot">=</span><span class="st">sudo displaymgr default</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="dt">Type</span><span class="ot">=</span><span class="st">Application</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="dt">Icon</span><span class="ot">=</span><span class="st">display-brightness-symbolic</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dt">Keywords</span><span class="ot">=</span><span class="st">display;brightness;default;reset;standard;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="dt">Categories</span><span class="ot">=</span><span class="st">Utility;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="dt">StartupNotify</span><span class="ot">=</span><span class="kw">false</span></span></code></pre></div>
+<p>The last remaining thing is to make the displaymgr runnable without
+providing the password. To do that, execute
+<code>$ sudo visudo /etc/sudoers.d/displaymgr</code> and save it with
+the following content:
+<code>ALL ALL = NOPASSWD:/usr/bin/displaymgr</code>.</p>
+<p>With all of that done, I was now able to control the brightness and
+contrast of my monitor just as easily as launching an application.</p>
 <figure>
-<img src="changing-brightness-and-contrast-using-application-launcher--launcher.png" alt="" /><figcaption>Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM</figcaption>
+<img
+src="changing-brightness-and-contrast-using-application-launcher--launcher.png"
+alt="Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM" />
+<figcaption aria-hidden="true">Pop!_OS Application Launcher with
+Brightness entries controlling the mentioned properties on top of my
+Terminal window with this very article being written using
+VIM</figcaption>
 </figure>
         </section>
     </article>
@@ -964,10 +1173,41 @@ code span.wa {
             </small>        </header>
 
         <section>
-            <p>The window in my home office heads straight south. It means the amount of light I get in my room throughout the day varies from very little to a lot. In a way, it’s great, because I don’t feel like I’m losing the whole day sitting in a box with some artificial light. At the same time, adjusting my screen to match the light intensity in my room every two hours isn’t the most convenient thing to do at all. For a long time I’ve been using f.lux on Windows and Redshift on Linux. These worked fine, although I’ve never been a fan of changing the color temperature to make the screen bearable. At some point I’ve dropped both of these and started adjusting the brightness and contrast levels of my screen manually. As you can imagine, it got tedious after a while. This article describes my way of solving it in a semi-automatic way.</p>
-<p>Many people probably don’t realize that monitors we’re nowadays using with our computers are capable of communicating with operating systems in a more sophisticated way than just determining whether the screen is on or off. I certainly didn’t. Most if not all modern monitors support <em>Monitor Control Command Set</em> (MCCS) over I<sup>2</sup>C (<em>eye-squared-C</em>) bus. The MCCS is nothing else but a standard defining a set of parameters that can be adjusted by poking the monitor over any supported protocol - in our case, I<sup>2</sup>C.</p>
-<p>After learning all that’s the case, I began looking for something that would allow me to easily leverage the MCCS. I didn’t look far when I found <a href="https://www.ddcutil.com/">ddcutil</a>. Unfortunately, it’s Linux-only. Since I’m not using Windows anymore, I’m not sure how it looks there. Last I heard, some Intel graphics drivers were exposing MCCS related settings as part of their control panel. Also, according to that tool’s website, I<sup>2</sup>C is only used by external monitors. Laptop screens aren’t using I<sup>2</sup>C so the following method isn’t supported.</p>
-<p>The goal now was to use <em>ddcutil</em> to change the brightness and contrast level of my monitor. Reading the manpages revealed the first thing I had to do was to obtain two unique VCP codes identifying the properties used by my monitor to control these parameters. Running <code>$ ddcutil vcpinfo</code> gave me a long list which contained these two (although YMMV):</p>
+            <p>The window in my home office heads straight south. It means the
+amount of light I get in my room throughout the day varies from very
+little to a lot. In a way, it’s great, because I don’t feel like I’m
+losing the whole day sitting in a box with some artificial light. At the
+same time, adjusting my screen to match the light intensity in my room
+every two hours isn’t the most convenient thing to do at all. For a long
+time I’ve been using f.lux on Windows and Redshift on Linux. These
+worked fine, although I’ve never been a fan of changing the color
+temperature to make the screen bearable. At some point I’ve dropped both
+of these and started adjusting the brightness and contrast levels of my
+screen manually. As you can imagine, it got tedious after a while. This
+article describes my way of solving it in a semi-automatic way.</p>
+<p>Many people probably don’t realize that monitors we’re nowadays using
+with our computers are capable of communicating with operating systems
+in a more sophisticated way than just determining whether the screen is
+on or off. I certainly didn’t. Most if not all modern monitors support
+<em>Monitor Control Command Set</em> (MCCS) over I<sup>2</sup>C
+(<em>eye-squared-C</em>) bus. The MCCS is nothing else but a standard
+defining a set of parameters that can be adjusted by poking the monitor
+over any supported protocol - in our case, I<sup>2</sup>C.</p>
+<p>After learning all that’s the case, I began looking for something
+that would allow me to easily leverage the MCCS. I didn’t look far when
+I found <a href="https://www.ddcutil.com/">ddcutil</a>. Unfortunately,
+it’s Linux-only. Since I’m not using Windows anymore, I’m not sure how
+it looks there. Last I heard, some Intel graphics drivers were exposing
+MCCS related settings as part of their control panel. Also, according to
+that tool’s website, I<sup>2</sup>C is only used by external monitors.
+Laptop screens aren’t using I<sup>2</sup>C so the following method isn’t
+supported.</p>
+<p>The goal now was to use <em>ddcutil</em> to change the brightness and
+contrast level of my monitor. Reading the manpages revealed the first
+thing I had to do was to obtain two unique VCP codes identifying the
+properties used by my monitor to control these parameters. Running
+<code>$ ddcutil vcpinfo</code> gave me a long list which contained these
+two (although YMMV):</p>
 <pre><code>VCP code 10: Brightness
    Increase/decrease the brightness of the image.
    MCCS versions: 2.0, 2.1, 3.0, 2.2
@@ -978,11 +1218,24 @@ code span.wa {
    MCCS versions: 2.0, 2.1, 3.0, 2.2
    ddcutil feature subsets: PROFILE, COLOR
    Attributes: Read Write, Continuous (normal)</code></pre>
-<p>Having the above, I was now able to call the <em>setvcp</em> command of <em>ddcutil</em> with both the VCP code for brightness and the desired brightness level. The same applied to contrast. The manpages state the value must be in range of 0 to 255, though keep in mind that the brightness and contrast levels of most monitors range from 0 to a 100.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="ex">ddcutil</span> setvcp 10 <span class="op">&lt;</span>brightness-level<span class="op">&gt;</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>$ <span class="ex">ddcutil</span> setvcp 12 <span class="op">&lt;</span>contrast-level<span class="op">&gt;</span></span></code></pre></div>
-<p>That was it. Executing these made my monitor immediately adjust the levels to my liking.</p>
-<p>Of course, being a programmer comes with a certain degree of a responsibility so I couldn’t just stop there. I had to hook it up somehow so I didn’t have to run these from the CLI. I’ve described my method in the <a href="#changing-brightness-and-contrast-using-application-launcher">Changing the brightness and contrast using the application launcher</a>.</p>
+<p>Having the above, I was now able to call the <em>setvcp</em> command
+of <em>ddcutil</em> with both the VCP code for brightness and the
+desired brightness level. The same applied to contrast. The manpages
+state the value must be in range of 0 to 255, though keep in mind that
+the brightness and contrast levels of most monitors range from 0 to a
+100.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ddcutil setvcp 10 <span class="op">&lt;</span>brightness-level<span class="op">&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ddcutil setvcp 12 <span class="op">&lt;</span>contrast-level<span class="op">&gt;</span></span></code></pre></div>
+<p>That was it. Executing these made my monitor immediately adjust the
+levels to my liking.</p>
+<p>Of course, being a programmer comes with a certain degree of a
+responsibility so I couldn’t just stop there. I had to hook it up
+somehow so I didn’t have to run these from the CLI. I’ve described my
+method in the <a
+href="#changing-brightness-and-contrast-using-application-launcher">Changing
+the brightness and contrast using the application launcher</a>.</p>
         </section>
     </article>
 

@@ -2,8 +2,10 @@
   --color-background: #fdfdfd;
   --color-foreground: #333;
   --color-href: dodgerblue;
-  --color-pre-background: #ddd;
+  --color-pre-background: #f4f4f4;
   --color-muted: #777;
+  --color-article-separator: #ddd;
+  --border-radius: 0.3rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -13,6 +15,7 @@
     --color-href: tomato;
     --color-pre-background: #111;
     --color-muted: #aaa;
+    --color-article-separator: #555;
   }
 }
 
@@ -22,21 +25,23 @@ body {
   align-items: stretch;
   background: var(--color-background);
   color: var(--color-foreground);
-  font-family: sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
+  font-family: serif;
+  font-size: 14px;
+  line-height: 1.6;
   word-spacing: .05em;
   width: 90%;
   margin: 0 auto;
 }
 
 p > code {
-  padding: 0 .3rem;
+  padding: .2rem .3rem;
 }
 
 pre, code {
+  font-size: .9rem;
   color: var(--color-muted);
   background: var(--color-pre-background);
+  border-radius: var(--border-radius);
 }
 
 pre {
@@ -49,11 +54,6 @@ a {
   color: var(--color-href);
 }
 
-hr {
-  display: block;
-  width: 100%;
-}
-
 a:hover {
   text-decoration: underline;
 }
@@ -62,6 +62,7 @@ body > header {
   display: flex;
   justify-content: space-between;
   flex-direction: column;
+  margin-bottom: 2rem
 }
 
 nav {
@@ -71,8 +72,8 @@ nav {
 
 @media screen and (min-width: 1024px) {
   body {
-    width: 80%;
-    font-size: 18px;
+    width: 50%;
+    font-size: 16px;
   }
 
   body > header {
@@ -85,12 +86,27 @@ nav {
   }
 }
 
+@media screen and (min-width: 1920px) {
+  body {
+    width: 40%;
+  }
+}
+
 article + article {
   margin-top: 4rem;
 }
 
+article + hr {
+  border-bottom: .15rem dashed var(--color-article-separator);
+  width: 100%;
+  outline: 0;
+  background: transparent;
+  color: transparent;
+  margin: 4rem 0;
+}
+
 article header {
-  padding-bottom: 1rem;
+  padding-bottom: 1.5rem;
 }
 
 article > header > * {
@@ -107,13 +123,10 @@ article section {
 
 article figure {
   background: var(--color-pre-background);
-  padding: 0;
   margin: 0;
-}
-
-article figure {
   padding: 1rem;
   display: block;
+  border-radius: var(--border-radius);
 }
 
 article figure img {
@@ -121,16 +134,18 @@ article figure img {
   margin: 0 auto;
   max-width: 100%;
   height: auto;
+  border-radius: var(--border-radius);
 }
 
 article figure figcaption {
   padding-top: 1rem;
-  font-size: .9rem;
+  font-size: .8rem;
   text-align: center;
   color: var(--color-muted);
 }
 
 footer {
   color: var(--color-muted);
-  margin-top: .5rem;
-}
+  font-size: .8rem;
+  margin-bottom: 2rem;
+  margin-top: -2rem;}

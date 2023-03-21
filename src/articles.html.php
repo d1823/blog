@@ -6,12 +6,18 @@
     </article>
 <?php endif; ?>
 
-<?php foreach($articles as $article): ?>
+<?php foreach($articles as $index => $article): ?>
+    <?php if ($index > 0): ?>
+    <hr>
+    <?php endif; ?>
+
     <article id="<?= $article->id ?>">
         <header>
             <a href="#<?= $article->id ?>">
                 <h2><?= $article->title ?></h2>
             </a>
+
+            <br/>
 
             <small>
                 from <time datetime="<?= $article->creation_time ?>"><?= $article->creation_human_time ?></time>
@@ -26,3 +32,5 @@
         </section>
     </article>
 <?php endforeach; ?>
+
+<hr>

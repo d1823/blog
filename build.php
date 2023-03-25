@@ -104,7 +104,7 @@ $articles = array_map(
         $update_time = $update_date?->format('Y-m-d');
         $update_human_time = $update_date?->format('F d, Y');
 
-        $url = "$page_url#$id";
+        $url = url(host: $page_url, hash: $id);
 
         return (object)compact(
             'id',
@@ -145,33 +145,29 @@ file_put_contents("$build_dir/CNAME", parse_url($page_url, PHP_URL_HOST));
  * I'm rendering this blog. You can find all the templates in
  * the /src directory in *.html.php and *.xml.php files.
  */
-file_put_contents(
+render_to_path(
     "$build_dir/index.html",
-    render_to_string(
-        "$src_dir/base.html.php",
-        compact('page_title', 'page_description', 'page_url', 'styles', 'feed') + [
-            'content' => render_to_string(
-                "$src_dir/articles.html.php",
-                compact('articles')
-            )
-        ]
-    )
+    "$src_dir/base.html.php",
+    compact('page_title', 'page_description', 'page_url', 'styles', 'feed') + [
+        'content' => render_to_string(
+            "$src_dir/articles.html.php",
+            compact('articles')
+        )
+    ]
 );
 
 /**
  * 7. RENDERING THE CONTACT PAGE
  */
-file_put_contents(
+render_to_path(
     "$build_dir/contact.html",
-    render_to_string(
-        "$src_dir/base.html.php",
-        compact('page_title', 'page_description', 'page_url', 'styles', 'feed') + [
-            'content' => render_to_string(
-                "$src_dir/contact.html.php",
-                compact('email_address', 'twitter_username')
-            )
-        ]
-    )
+    "$src_dir/base.html.php",
+    compact('page_title', 'page_description', 'page_url', 'styles', 'feed') + [
+        'content' => render_to_string(
+            "$src_dir/contact.html.php",
+            compact('email_address', 'twitter_username')
+        )
+    ]
 );
 
 /**
@@ -180,10 +176,20 @@ file_put_contents(
  * Did I mentioned I'm generating my own RSS feed?
  * It's a shame it's not that common anymore.
  */
-file_put_contents(
+render_to_path(
     "$build_dir/$feed",
-    render_to_string("$src_dir/feed.xml.php", compact('page_title', 'page_description', 'page_url', 'articles'))
+    "$src_dir/feed.xml.php",
+    compact('page_title', 'page_description', 'page_url', 'articles')
 );
+
+function url(string $host, string $hash = "", string|array $path = "", string|array $query = ""): string
+{
+    return rtrim($host, '/')
+        . "/"
+        . ($hash ? "#$hash" : "")
+        . ($path ? implode('/', array_map(fn(string $value) => ltrim($path, '/'), (array)$path)) : "")
+        . ($query ? implode('/', array_map(fn(string $value) => ltrim($path, '/'), (array)$query)) : "");
+}
 
 function files_from_dir(string $path, string $extension = null): array
 {
@@ -200,6 +206,14 @@ function files_from_dir(string $path, string $extension = null): array
     sort($paths);
 
     return $paths;
+}
+
+function render_to_path(string $path, string $template_path, array $content = []): void
+{
+    file_put_contents(
+        $path,
+        render_to_string($template_path, $content)
+    );
 }
 
 function render_to_string(string $template_path, array $content = []): string
@@ -233,17 +247,17 @@ function parse_description(string $pathname): string
     return $description;
 }
 
-function parse_date(string $pathname): DateTime
+function parse_date(string $pathname): DateTimeInterface
 {
     $date_format = 'Y-m-d';
     $date_string = parse_token("DATE", $pathname);
 
-    $date = DateTime::createFromFormat(
+    $date = DateTimeImmutable::createFromFormat(
         $date_format,
         $date_string
     );
 
-    $errors = DateTime::getLastErrors();
+    $errors = DateTimeImmutable::getLastErrors();
 
     if (!empty($errors['warning_count']) || $date === false) {
         throw new \RuntimeException("$pathname: date $date_string isn't formatted as $date_format");
@@ -252,7 +266,7 @@ function parse_date(string $pathname): DateTime
     return $date;
 }
 
-function parse_update_date(string $pathname): ?DateTime
+function parse_update_date(string $pathname): ?DateTimeInterface
 {
     try {
         $date_format = 'Y-m-d';
@@ -261,12 +275,12 @@ function parse_update_date(string $pathname): ?DateTime
         return null;
     }
 
-    $date = DateTime::createFromFormat(
+    $date = DateTimeImmutable::createFromFormat(
         $date_format,
         $date_string
     );
 
-    $errors = DateTime::getLastErrors();
+    $errors = DateTimeImmutable::getLastErrors();
 
     if (!empty($errors['warning_count']) || $date === false) {
         throw new \RuntimeException("$pathname: date $date_string isn't formatted as $date_format");

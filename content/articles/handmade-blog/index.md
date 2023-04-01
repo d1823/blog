@@ -7,7 +7,7 @@ For me, it means this blog is built using a set of readily available technologie
 
 Over the years I had a few failed attempts with blogging - I've tried blogger, wordpress.com, tumblr, hugo, jekyll and a few others. Nothing has stuck with me and while none of these solutions were the fault of my lack of enthusiasm, they didn't feel like anything I'd want to use for an extended period. Mostly, I felt they were way too complex for what I wanted to do - ramble about stuff without worrying about security, complex themes, or configurations. I didn't need any of it - instead, I wanted a simple solution that would gather the stuff I've written, repackage it and lay it out in some nice way. Years have passed, and trends have changed, but my requirements didn't budge - I still wanted the same thing.
 
-![Google search results showing a list of the most popular completions for a phrase "Build a blog with..."](handmade-blog--build-a-blog-with.png)
+![Google search results showing a list of the most popular completions for a phrase \"Build a blog with...\"](build-a-blog-with.png)
 
 At some point, two years ago, I convinced myself to give blogging another try. This time though, I wanted nothing to do with these big blogging platforms or extensible static site generators. I decided to implement something myself. What were my requirements? I knew that each article needed to be defined by a title, description, publication date, and optional modification date. How did I do that, given I wanted to have just a single file per article and it had to be a markdown file? I decided to utilize the reference-style links supported by most of the available Markdown converters - they have the following syntax: `[id]: url "title"`. The trick was to use an identifier that isn't referenced anywhere and the shortest, valid URL. The title would be used to store any data I wanted, while the whole line would be ignored by the converter. In the end, I came up with the following structure:
 
@@ -71,9 +71,9 @@ I followed the same approach while implementing the RSS support. Given that RSS 
 <?xml version="1.0" ?>
 <rss version="2.0">
     <channel>
-        <title><?= $page_title ?></title>
-        <link><?= $page_url ?></link>
-        <description><?= $page_description ?></description>
+        <title><?= $site_title ?></title>
+        <link><?= $site_url ?></link>
+        <description><?= $site_description ?></description>
 
         <?php foreach($articles as $article): ?>
            <item>
@@ -86,7 +86,7 @@ I followed the same approach while implementing the RSS support. Given that RSS 
 </rss>
 ```
 
-![List of articles formatted as RSS, displayed using the RSSPreview Firefox extension](handmade-blog--rss.png)
+![List of articles formatted as RSS, displayed using the RSSPreview Firefox extension](rss.png)
 
 As for converting the articles into HTML, I decided to use [pandoc](https://pandoc.org/), a swiss-army knife when it comes to converting documents between formats. Here's the neat part, though. Did you know that pandoc can also syntax highlight code blocks? It utilizes the [skylighting](https://github.com/jgm/skylighting) to parse and tag the source code. The result is a build-time highlighted code block, styleable using CSS. I opted for the monochrome theme that uses font weight, instead of colors, to highlight the code. Works great!
 

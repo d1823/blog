@@ -9,9 +9,9 @@ $is_served_locally = $argc > 1 && $argv[1] === '--local';
  * This section allows to set the title and description of the blog, as well
  * as its url in both local and live environments, or contact handles.
  */
-$page_title = "d1823's programming ramblings";
-$page_description = "d1823's programming ramblings";
-$page_url = $is_served_locally ? 'http://localhost:8080' : "https://1823.pl/";
+$site_title = "d1823.pl";
+$site_description = "d1823's programming ramblings";
+$site_url = $is_served_locally ? 'http://localhost:8080' : "https://1823.pl/";
 $email_address = "ramblings@1823.pl";
 $twitter_username = "_d1823";
 
@@ -23,7 +23,7 @@ $twitter_username = "_d1823";
  */
 $build_dir = $is_served_locally ? __DIR__ . "/local-docs" : __DIR__ . "/docs";
 $src_dir = __DIR__ . "/src";
-$articles_dir = __DIR__ . "/articles";
+$content_dir = __DIR__ . "/content";
 $feed = "feed.xml";
 
 /**
@@ -43,7 +43,15 @@ $styles = array_reduce(files_from_dir("$src_dir/assets"), function (string $styl
     return $styles . file_get_contents($asset_pathname);
 }, '');
 
-$articles_images = files_from_dir($articles_dir, "png");
+/**
+ * @var $it array<string, SplFileInfo>
+ */
+$it = new RecursiveIteratorIterator(
+    new RecursiveCallbackFilterIterator(
+        new RecursiveDirectoryIterator($content_dir, FilesystemIterator::SKIP_DOTS),
+        fn(SplFileInfo $file) => $file->isDir() || $file->getExtension() === 'md'
+    )
+);
 
 /**
  * 3. GENERATING THE CONTENT
@@ -65,63 +73,65 @@ $articles_images = files_from_dir($articles_dir, "png");
  *     [//]: # (DESCRIPTION: My first article about starting up this beautiful blogging journey!)
  *     [//]: # (DATE: 2019-07-31)
  *
- * If the article contains images, they are named after the article
- * name and will be placed in the output directory. In result, only
- * referenced images will be copied to the output directory.
- *
- * The filename of the article is used as a header id to enable readers
- * to link to articles through hash location.
- *
  * I personally feel all of this is really neat.
  */
-$articles = array_map(
-    function (string $pathname) use ($articles_dir, $articles_images, $build_dir, $page_url): stdClass {
-        $id = pathinfo($pathname, PATHINFO_FILENAME);
+$pages = [];
 
-        $title = parse_title($pathname);
-        $description = parse_description($pathname);
-        $content = shell_exec("pandoc -f markdown -t html $pathname 2> /dev/null");
+foreach ($it as $file) {
+    /*
+     * Processing a post bundle and a standalone post needs to happen a bit differently.
+     *
+     * When a post bundle is processed, the $path is an absolutely rebased real-path of the parent directory:
+     *    /home/john/my-blog/content/articles/juggling/index.md => /articles/juggling
+     * The $id is the name of the parent directory, and the directory processing is required.
+     *
+     * When a standalone post is processed, the $path is an absolutely rebased real-path of the file itself,
+     * without its extension:
+     *    /home/john/my-blog/content/articles/juggling.md => /articles/juggling
+     * The $id is its name without the extension, and the directory processing is not required, because
+     * no accompanying files are allowed.
+     */
+    [$url, $id, $should_process_directory] = match ($basename = $file->getBasename(".{$file->getExtension()}")) {
+        "index" => [
+            str_replace(
+                $content_dir,
+                "",
+                $file->getPathInfo()->getRealPath(),
+            ),
+            $file->getPathInfo()->getBasename(),
+            true
+        ],
+        default => [
+            str_replace(
+                $content_dir,
+                "",
+                str_replace($file->getFilename(), $basename, $file->getRealPath())
+            ),
+            $basename,
+            false
+        ]
+    };
 
-        if (!$content) {
-            throw new \RuntimeException("Converting markdown to html has failed. Make sure pandoc is installed.");
-        }
+    $template_path = $file->getRealPath();
 
-        foreach ($articles_images as $image_pathname) {
-            if (!stristr($image_pathname, $id)) {
-                continue;
-            }
+    $title = parse_title($file->getRealPath());
+    $description = parse_description($file->getRealPath());
 
-            $image_basename = pathinfo($image_pathname, PATHINFO_BASENAME);
+    $creation_date = parse_date($file->getRealPath());
+    $update_date = parse_update_date($file->getRealPath());
 
-            copy($image_pathname, "$build_dir/$image_basename");
-        }
+    $pages[] = (object)compact(
+        'template_path',
+        'id',
+        'title',
+        'description',
+        'creation_date',
+        'update_date',
+        'url'
+    );
+}
 
-        $creation_date = parse_date($pathname);
-        $creation_time = $creation_date->format('Y-m-d');
-        $creation_human_time = $creation_date->format('F d, Y');
-
-        $update_date = parse_update_date($pathname);
-        $update_time = $update_date?->format('Y-m-d');
-        $update_human_time = $update_date?->format('F d, Y');
-
-        $url = url(host: $page_url, hash: $id);
-
-        return (object)compact(
-            'id',
-            'title',
-            'description',
-            'creation_date',
-            'creation_time',
-            'creation_human_time',
-            'update_date',
-            'update_time',
-            'update_human_time',
-            'content',
-            'url'
-        );
-    },
-    files_from_dir($articles_dir, "md")
-);
+$articles = array_filter($pages, fn(stdClass $page) => str_starts_with($page->url, '/articles'));
 
 /**
  * 4. SORTING ARTICLES USING THEIR DATES
@@ -136,7 +146,7 @@ usort($articles, function (object $article, object $other_article) {
  * My blog is hosted using GitHub Pages with a custom domain.
  * This file lets me publish it under a domain of my choice.
  */
-file_put_contents("$build_dir/CNAME", parse_url($page_url, PHP_URL_HOST));
+file_put_contents("$build_dir/CNAME", parse_url($site_url, PHP_URL_HOST));
 
 /**
  * 6. RENDERING THE ARTICLES PAGE
@@ -145,30 +155,48 @@ file_put_contents("$build_dir/CNAME", parse_url($page_url, PHP_URL_HOST));
  * I'm rendering this blog. You can find all the templates in
  * the /src directory in *.html.php and *.xml.php files.
  */
-render_to_path(
+render_php_to_path(
     "$build_dir/index.html",
     "$src_dir/base.html.php",
-    compact('page_title', 'page_description', 'page_url', 'styles', 'feed') + [
-        'content' => render_to_string(
-            "$src_dir/articles.html.php",
+    compact('site_description', 'site_url', 'styles', 'feed') + [
+        'site_title' => "Blog - $site_title",
+        'page_url' => '/',
+        'content' => render_php_to_string(
+            "$src_dir/_articles.html.php",
             compact('articles')
         )
     ]
 );
 
 /**
- * 7. RENDERING THE CONTACT PAGE
+ * 7. RENDERING PAGES
  */
-render_to_path(
-    "$build_dir/contact.html",
-    "$src_dir/base.html.php",
-    compact('page_title', 'page_description', 'page_url', 'styles', 'feed') + [
-        'content' => render_to_string(
-            "$src_dir/contact.html.php",
-            compact('email_address', 'twitter_username')
-        )
-    ]
-);
+foreach ($pages as $page) {
+    render_php_to_path(
+        join_path($build_dir, $page->url) . ".html",
+        "$src_dir/base.html.php",
+        [
+            'site_title' => sprintf("%s - %s", $page->title, $site_title),
+            'site_description' => $page->description,
+            'site_url' => $site_url,
+            'page_url' => $page->url,
+            'styles' => $styles,
+            'feed' => $feed,
+            'content' => render_php_to_string(
+                "$src_dir/_page.html.php",
+                [
+                    'title' => $page->title,
+                    'creation_date' => $page->creation_date,
+                    'update_date' => $page->update_date,
+                    'content' => render_md_to_string(
+                        $page->template_path,
+                        compact('email_address', 'twitter_username')
+                    )
+                ]
+            )
+        ]
+    );
+}
 
 /**
  * 8. THE FEED
@@ -176,19 +204,19 @@ render_to_path(
  * Did I mentioned I'm generating my own RSS feed?
  * It's a shame it's not that common anymore.
  */
-render_to_path(
+render_php_to_path(
     "$build_dir/$feed",
     "$src_dir/feed.xml.php",
-    compact('page_title', 'page_description', 'page_url', 'articles')
+    compact('site_title', 'site_description', 'site_url', 'articles')
 );
 
-function url(string $host, string $hash = "", string|array $path = "", string|array $query = ""): string
+function join_path(string ...$parts): string
 {
-    return rtrim($host, '/')
-        . "/"
-        . ($hash ? "#$hash" : "")
-        . ($path ? implode('/', array_map(fn(string $value) => ltrim($path, '/'), (array)$path)) : "")
-        . ($query ? implode('/', array_map(fn(string $value) => ltrim($path, '/'), (array)$query)) : "");
+    return array_reduce(
+        array_slice($parts, 1),
+        static fn($path, string $part): string => $path . DIRECTORY_SEPARATOR . ltrim($part, DIRECTORY_SEPARATOR),
+        $parts[0]
+    );
 }
 
 function files_from_dir(string $path, string $extension = null): array
@@ -208,21 +236,69 @@ function files_from_dir(string $path, string $extension = null): array
     return $paths;
 }
 
-function render_to_path(string $path, string $template_path, array $content = []): void
+function render_php_to_path(string $path, string $template_path, array $content = []): void
 {
+    if (!is_dir($dir = dirname($path))) {
+        mkdir($dir, recursive: true);
+    }
+
     file_put_contents(
         $path,
-        render_to_string($template_path, $content)
+        render_php_to_string($template_path, $content),
     );
 }
 
-function render_to_string(string $template_path, array $content = []): string
+function render_php_to_string(string $template_path, array $content = []): string
 {
     extract($content);
 
     ob_start();
     include $template_path;
     return ob_get_clean();
+}
+
+function render_md_to_string(string $template_path, array $content = []): string
+{
+    $spec = [
+        ['file', '/dev/null', 'r'],
+        ['pipe', 'w'],
+        ['file', '/dev/null', 'a']
+    ];
+
+    $proccess = proc_open("pandoc --self-contained -f markdown -t html $template_path", $spec, $pipes, dirname($template_path));
+
+    if (!is_resource($proccess)) {
+        throw new \RuntimeException("Converting markdown to html has failed. Make sure pandoc is installed.");
+    }
+
+    $result = stream_get_contents($pipes[1]);
+    fclose($pipes[1]);
+
+    if (!$result) {
+        throw new \RuntimeException("Converting markdown to html has failed. Make sure pandoc is installed.");
+    }
+
+    $doc = new DOMDocument();
+    @$doc->loadHTML($result);
+    $elements = $doc->getElementsByTagName('body');
+    $body = $elements[0] ?? null;
+    $newDoc = new DOMDocument();
+    foreach ($body->childNodes as $child) {
+        $node = $newDoc->importNode($child, true);
+        $newDoc->appendChild($node);
+    }
+    $newDoc->appendChild($node);
+    $result = $newDoc->saveHTML();
+
+    if (!$result) {
+        throw new \RuntimeException("Converting markdown to html has failed. Make sure pandoc is installed.");
+    }
+
+    return str_replace(
+        array_map(fn(string $value) => sprintf("{{%s}}", $value), array_keys($content)),
+        array_values($content),
+        $result
+    );
 }
 
 function parse_title(string $pathname): string
@@ -247,10 +323,14 @@ function parse_description(string $pathname): string
     return $description;
 }
 
-function parse_date(string $pathname): DateTimeInterface
+function parse_date(string $pathname): ?DateTimeInterface
 {
-    $date_format = 'Y-m-d';
-    $date_string = parse_token("DATE", $pathname);
+    try {
+        $date_format = 'Y-m-d';
+        $date_string = parse_token("DATE", $pathname);
+    } catch (RuntimeException) {
+        return null;
+    }
 
     $date = DateTimeImmutable::createFromFormat(
         $date_format,

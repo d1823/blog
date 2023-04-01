@@ -1,4 +1,4 @@
-[//]: # (TITLE: Changing the brightness and contrast using the application launcher)
+[//]: # (TITLE: Changing your display's brightness using the system launcher)
 [//]: # (DESCRIPTION: Using application launcher to control the brightness and contrast of my screen)
 [//]: # (DATE: 2021-10-03)
 [//]: # (UPDATE DATE: 2023-01-11)
@@ -135,4 +135,4 @@ The last remaining thing is to make the displaymgr runnable without providing th
 
 With all of that done, I was now able to control the brightness and contrast of my monitor just as easily as launching an application.
 
-![Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM](changing-brightness-and-contrast-using-application-launcher--launcher.png)
+![Pop!_OS Application Launcher with Brightness entries controlling the mentioned properties on top of my Terminal window with this very article being written using VIM](launcher.png)

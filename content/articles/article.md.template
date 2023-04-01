@@ -1,0 +1,15 @@
+[//]: # (TITLE: First Article)
+[//]: # (DESCRIPTION: My first article about starting up this beatuful blogging journey!)
+[//]: # (DATE: 2019-07-31)
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam mollis dignissim tellus, id sodales nisl tempus a. Phasellus ullamcorper mi quis mi commodo, ac egestas eros tincidunt. Curabitur nec lorem in lorem venenatis aliquet. Curabitur velit lectus, pulvinar a nulla scelerisque, porttitor tincidunt arcu. In consectetur congue risus, ac dapibus tellus congue sit amet. Pellentesque ut iaculis sem. `Integer` aliquet dui ac elit tincidunt vestibulum.
+
+```php
+<?php
+	function hello_world() {
+		echo("Hello, world!");
+	}
+
+	hello_world();
+?>
+```

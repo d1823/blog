@@ -13,34 +13,7 @@ a.sourceLine:empty {
   height: 1.2em;
 }
 
-.sourceCode {
-  overflow: auto;
-}
-
-code.sourceCode {
-  white-space: pre;
-  position: relative;
-}
-
-div.sourceCode {
-  margin: 1em 0;
-  font-size: .9rem;
-}
-
-pre.sourceCode {
-  margin: 0;
-}
-
-@media screen {
-  div.sourceCode {
-    overflow: auto;
-  }
-}
-
 @media print {
-  code.sourceCode {
-    white-space: pre-wrap;
-  }
   a.sourceLine {
     text-indent: -1em;
     padding-left: 1em;

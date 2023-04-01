@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="d1823's programming ramblings">
+    <meta name="description" content="Why Doctrine's ServiceEntityRepository, and not EntityRepository, should be only be ever used as a service">
 
     <base href="https://1823.pl/">
 
-    <title>Blog - d1823.pl</title>
+    <title>Using Doctrine's EntityRepository as a service is a bad idea - d1823.pl</title>
 
     <style>
         /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
@@ -710,7 +710,7 @@ code span.wa {
     <link
         href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TRZGKQzuoCGaoThZERRy1CkWoEGqFVh1MLv2CJg1Jiouj4Fpw8GOx6uDirKuDqyAIfoC4ujgpukiJ/0sKLWI8OO7Hu3uPu3eAUC8zzeoYBzTdNlOJuJjJropdrwhiAGEMIyQzy5iTpCR8x9c9Any9i/Es/3N/jl41ZzEgIBLPMsO0iTeIpzdtg/M+cYQVZZX4nHjMpAsSP3Jd8fiNc8FlgWdGzHRqnjhCLBbaWGljVjQ14iniqKrplC9kPFY5b3HWylXWvCd/YSinryxzneYQEljEEiSIUFBFCWXYiNGqk2IhRftxH/+g65fIpZCrBEaOBVSgQXb94H/wu1srPznhJYXiQOeL43yMAF27QKPmON/HjtM4AYLPwJXe8lfqwMwn6bWWFj0C+raBi+uWpuwBlztA/5Mhm7IrBWkK+TzwfkbflAXCt0DPmtdbcx+nD0CaukreAAeHwGiBstd93t3d3tu/Z5r9/QBS3nKamEF+kgAAAAZiS0dEAP0AcAA7rB2u5wAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAAd0SU1FB+cDGRUMGX8XZQgAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAC/0lEQVR42u3by2sTQRwH8O/MbJPYpm9bU6qJEm1BPbSCgiDqTWxFvGrFQ/8AsQcv/gFa8KQHqYgHwYuIePAgilI8ScG2qPVRsI0varQNTdMkbZKdGQ8VtbabrM86ye93HTbZ+ex35wXL5vrLNEq4OEq8CIAACIAACIAACIAACIAACKA0y/rvbmjLIMTqrcu2ZQd7oJMXKAEEQAAEQAAEQADFCqBliQPITJGtBEU7ROA4eN02sIomMKscYAw6l4LOxKFiQ1DRK9DZ218CMF88AGLNeYhwF1iZf0kb81aDeavBq0JAsBP2+HXIiW6wXLw4AKz1NyBCB1xKeWBt6gJWNUPNvoQwHUAE+tx3/vubWbsXMlpu9iDIPJ2wwod/A2+H2a8AD/UAlq/AVKeh0x+hs7OA8IBXBADhLYLzAL4ZVuP2/LPcpyHIsdPQ2VuLrwv1QgT3mQ3A67vzPn0ZHYA9untpg3oOO3IQWtyF1bzH3DGA1bQ5pz6Xhv3qZP50RE4BMmsuAPcHnTs3OQzIgQKrwEeQsWcGJ8BX55yA6UF3W4FkxFAAVr/siu9rx1LD7gDSY4YC8I0AY84dy7hLAHLTZgIwXpXnsSpAjbpLgG0ogLZH8ukA8Bf5gYj+kH8Ks9rcJcmqMXcW0Pac8x+V73T3I76QwQAZ5/eXVbe7S0Blq7kAasZ5CuMNLnZ5rAmiod3gBCScB0JeuQ4i0FfgEOUimNfgMUDFbwLKdu5gyzGI4DWA/xBzaxdE+I75u0HYDyGnnkI0OsSYCVgbDsEKdkClooCcB8oqFs4DmMBK1B8/EZJvLhU+2xce8KogeG0LuL95xTr/VwB0+jLku3u/dm0uBTn5xGwAALAjRyAnH/9kdHKwR85ARs4B0GYDAEnYL/ZDvr+/sA8oNHgm3iI7fAIqcRZ67ipUfNzQQXBRnmOwxzogJ46CN3WB17aC+erBhAdaZoDsLFTiNdTUA6hYL4DkN5BoP3hN+J8AMPpkpsSLAAiAAAiAAAiAAAiAAAigROszfw/sXyvnr2MAAAAASUVORK5CYII="
         rel="icon" type="image/x-icon">
-    <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Blog - d1823.pl">
+    <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Using Doctrine's EntityRepository as a service is a bad idea - d1823.pl">
 </head>
 <body>
 
@@ -728,32 +728,157 @@ code span.wa {
     </nav>
 </header>
 
-<nav id="articles">
-        <div class="article-link">
-        <span class="article-link__date">28/01/2023</span>
-
-        <a href="/articles/handmade-blog">
-            This blog is handmade        </a>
+<section class="page">
+    <div class="page__header">
+        <div class="header__meta">from 20/01/2023</div>        <h1 class="header__title">Using Doctrine's EntityRepository as a service is a bad idea</h1>
     </div>
-        <div class="article-link">
-        <span class="article-link__date">20/01/2023</span>
 
-        <a href="/articles/using-entity-repository-as-a-service">
-            Using Doctrine's EntityRepository as a service is a bad idea        </a>
-    </div>
-        <div class="article-link">
-        <span class="article-link__date">03/10/2021</span>
+    <div class="page__content">
+        
+<p>If you&#x2019;re using Symfony, you&#x2019;ve definitely written a Doctrine
+repository at some point. If you&#x2019;ve been using Symfony long enough,
+you&#x2019;ve probably seen the introduction of
+<em>ServiceEntityRepository</em> that complemented the default
+<em>EntityRepository</em> base class. Its initial goal was to ease the
+use of repositories with service containers, instead of being tied
+directly to Doctrine, but that&#x2019;s not what I want to talk about. I really
+want to talk about the implications of using the
+<em>EntityRepository</em> in a project, where every other repository
+extends the <em>ServiceEntityRepository</em>.</p>
+<p>During a bug-fixing-technical-debt-reducing period in one of the
+projects I&#x2019;m working on, I decided to take a look at a long-standing
+issue that was popping up in logs from time to time. It wasn&#x2019;t anything
+critical as the crash was happening in the context of Symfony&#x2019;s message
+consumer in the Messenger component, but the handler run often enough to
+eventually do what it was supposed to do. The exception we&#x2019;ve been
+getting was &#x201C;Entity manager is closed&#x201D; thrown by Doctrine. It wasn&#x2019;t
+apparent why it was thrown in the first place, because none of the
+operations executed by Doctrine, before this exception, failed in any
+way.</p>
+<p>I&#x2019;ve spent hours verifying the database schema and various input sets
+while trying to reproduce the crash locally. Eventually, I decided to
+look at it in a broader context - the handler was executed by a
+long-running consumer. It became apparent that the reason for throwing
+that exception might&#x2019;ve originated from a different part of the code
+that wasn&#x2019;t part of the executions paths under the affected handler. I
+looked at logs preceding the crash and noticed a pattern where it would
+only throw an exception if a previously consumed message resulted in the
+Doctrine exception as well.</p>
+<p>I was on the right track. At this point, I knew that the entity
+manager was being closed because of an exception thrown by a different
+handler processing a previous message. One question remained - why
+wasn&#x2019;t Doctrine reset to its original state before consuming a new
+message? After all, Messenger handles it implicitly through the <a href="https://github.com/symfony/doctrine-bridge/blob/5.4/Messenger/DoctrinePingConnectionMiddleware.php"><em>DoctrinePingConnectionMiddleware</em></a>
+- it resets the manager before passing the execution to the rest of the
+middleware stack.</p>
+<p>Here&#x2019;s where the topic of this article comes to light. It&#x2019;s because
+of the difference between the constructors of <em>EntityRepository</em>
+and <em>ServiceEntityRepository</em>. Let&#x2019;s take a look at both of
+these:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="cn">E</span>ntityRepository <span class="kw">implements</span> <span class="cn">O</span>bjectRepository<span class="ot">,</span> <span class="cn">S</span>electable</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="kw">function</span> <span class="bu">__construct</span>(<span class="cn">E</span>ntityManagerInterface <span class="va">$em</span><span class="ot">,</span> <span class="cn">C</span>lassMetadata <span class="va">$class</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">$this</span>-&gt;<span class="cn">_</span>entityName <span class="op">=</span> <span class="va">$class</span>-&gt;name<span class="ot">;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">$this</span>-&gt;<span class="cn">_</span>em         <span class="op">=</span> <span class="va">$em</span><span class="ot">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">$this</span>-&gt;<span class="cn">_</span>class      <span class="op">=</span> <span class="va">$class</span><span class="ot">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> <span class="cn">S</span>erviceEntityRepository <span class="kw">extends</span> <span class="cn">E</span>ntityRepository <span class="kw">implements</span> <span class="cn">S</span>erviceEntityRepositoryInterface</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="kw">function</span> <span class="bu">__construct</span>(<span class="cn">M</span>anagerRegistry <span class="va">$registry</span><span class="ot">,</span> <span class="dt">string</span> <span class="va">$entityClass</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">$manager</span> <span class="op">=</span> <span class="va">$registry</span>-&gt;getManagerForClass(<span class="va">$entityClass</span>)<span class="ot">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="va">$manager</span> <span class="op">===</span> <span class="kw">null</span>) {</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">LogicException</span>(<span class="fu">sprintf</span>(</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                <span class="st">'Could not find the entity manager for class "%s". Check your Doctrine configuration to make sure it is configured to load this entity&#x2019;s metadata.'</span><span class="ot">,</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                <span class="va">$entityClass</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>            ))<span class="ot">;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="kw">parent</span>::<span class="bu">__construct</span>(<span class="va">$manager</span><span class="ot">,</span> <span class="va">$manager</span>-&gt;getClassMetadata(<span class="va">$entityClass</span>))<span class="ot">;</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>We can immediately notice two things - first, the
+<em>ServiceEntityRepository</em> is extending the
+<em>EntityRepository</em>; second, in contrast to its parent,
+<em>ServiceEntityRepository</em> isn&#x2019;t constructed with an object
+implementing the <em>EntityManagerInterface</em>, but with an instance
+of <em>ManagerRegistry</em> instead. What&#x2019;s the difference?</p>
+<p>When an <em>EntityManager</em> encounters a driver exception during
+the <em>flush</em> operation, it&#x2019;s going to close. You won&#x2019;t be able to
+use this instance anymore as there&#x2019;s no way to make it reopen. By
+extension, all instances of repositories using that exact instance of
+<em>EntityManager</em> will become useless. You can, of course, reach
+the <em>ManagerRegistry</em> and call the <em>resetManager</em> method,
+but that won&#x2019;t fix anything, aside from giving you a fresh instance
+<em>EntityManager</em>. With <em>ServiceEntityRepository</em> it&#x2019;s a
+different story. Symfony implements its own <em>ManagerRegistry</em>
+that knows how to talk to a PSR&#x2019;s <em>ContainerInterface</em> and the
+<em>EntityManager</em> returned by the
+<em>ManagerRegistry::getManagerForClass</em> method is a proxy! When
+such <em>ManagerRegistry</em> is asked for a fresh
+<em>EntityManager</em>, it doesn&#x2019;t only construct a new one, it updates
+that same proxy with a fresh, connected instance. That way, when you
+reset the manager as part of your exception-handling procedure, this
+change is propagated throughout the system.</p>
+<p>With all that, let&#x2019;s come back to my original issue. At this point,
+we understand that the <em>EntityManager</em> should&#x2019;ve been reset
+before handling a new message, but it wasn&#x2019;t. When I took a look at the
+affected repository one more time, I noticed the issue. It was extending
+the <em>EntityRepository</em>, not the <em>ServiceEntityRepository</em>!
+When the messenger&#x2019;s middleware reset the manager, that repository
+wasn&#x2019;t affected by that change! The first <em>flush</em> operation had
+to fail because it was using an obsolete entity manager.</p>
+<p>At this point, you might be a little confused. Didn&#x2019;t I just say that
+<em>ServiceEntityRepository</em> constructs itself with a proxy to
+<em>EntityManager</em>? How am I sure it&#x2019;s not the same with Doctrine&#x2019;s
+<em>EntityManager</em>? It&#x2019;s because of its service definition and how
+it&#x2019;s fetched from the service container. If you take a look at the <a href="https://github.com/doctrine/DoctrineBundle/blob/2.8.x/DependencyInjection/DoctrineExtension.php"><em>DependencyInjection\DoctrineExtension</em></a>,
+you&#x2019;ll notice that every configured entity manager is a service.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">$container</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    -&gt;setDefinition(<span class="va">$entityManagerId</span><span class="ot">,</span> <span class="kw">new</span> <span class="cn">C</span>hildDefinition(<span class="st">'doctrine.orm.entity_manager.abstract'</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    -&gt;setPublic(<span class="kw">true</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    -&gt;setArguments([</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="kw">new</span> <span class="cn">R</span>eference(<span class="fu">sprintf</span>(<span class="st">'doctrine.dbal.%s_connection'</span><span class="ot">,</span> <span class="va">$entityManager</span>[<span class="st">'connection'</span>]))<span class="ot">,</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="kw">new</span> <span class="cn">R</span>eference(<span class="fu">sprintf</span>(<span class="st">'doctrine.orm.%s_configuration'</span><span class="ot">,</span> <span class="va">$entityManager</span>[<span class="st">'name'</span>]))<span class="ot">,</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    -&gt;setConfigurator([<span class="kw">new</span> <span class="cn">R</span>eference(<span class="va">$managerConfiguratorName</span>)<span class="ot">,</span> <span class="st">'configure'</span>])<span class="ot">;</span></span></code></pre></div>
+<p>Additionally, since the <em>EntityManagerInterface</em> is an alias
+to the <em>default_entity_manager</em>, you can be sure that when
+injected directly, it won&#x2019;t be a proxy.</p>
+<pre><code>Information for Service "doctrine.orm.default_entity_manager"
+=============================================================
 
-        <a href="/articles/changing-your-displays-brightness-using-the-system-launcher">
-            Changing your display's brightness using the system launcher        </a>
-    </div>
-        <div class="article-link">
-        <span class="article-link__date">28/08/2021</span>
+ The EntityManager is the central access point to ORM functionality.
 
-        <a href="/articles/controlling-my-screen-using-mccs">
-            Controlling my screen using MCCS        </a>
+ ---------------- ---------------------------------------------------------- 
+  Option           Value                                                     
+ ---------------- ---------------------------------------------------------- 
+  Service ID       doctrine.orm.default_entity_manager                       
+  Class            Doctrine\ORM\EntityManager                                
+  Tags             container.preload (class: Doctrine\ORM\Proxy\Autoloader)  
+  Public           yes                                                       
+  Synthetic        no                                                        
+  Lazy             yes                                                       
+  Shared           yes                                                       
+  Abstract         no                                                        
+  Autowired        no                                                        
+  Autoconfigured   no                                                        
+  Factory Class    Doctrine\ORM\EntityManager                                
+  Factory Method   create                                                    
+ ---------------- ----------------------------------------------------------</code></pre>
+<p>My takeaway from this case is to never use the
+<em>EntityManagerInterface</em> as a direct dependency. I even went as
+far as writing a PHPStan extension that forbids it. There are no
+legitimate cases that I can&#x2019;t think of that would require it, and the
+bugs caused by incorrect usage are really hard to track. I can&#x2019;t tell
+you what to do, but as for me - I&#x2019;m adding this thing to my list of
+&#x201C;must-do&#x201D; things while working on Symfony codebases.</p>
+
     </div>
-    </nav>
+</section>
 
 <footer>
     Copyright &copy; 2020-2023 1823.pl&nbsp;&mdash;&nbsp;<a

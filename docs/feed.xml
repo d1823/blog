@@ -1,29 +1,29 @@
 <?xml version="1.0" ?>
 <rss version="2.0">
     <channel>
-        <title>d1823's programming ramblings</title>
+        <title>d1823.pl</title>
         <link>https://1823.pl/</link>
         <description>d1823's programming ramblings</description>
 
                    <item>
                <title>This blog is handmade</title>
                <description>Building a blog using simple tools.</description>
-               <link>https://1823.pl/#handmade-blog</link>
+               <link>/articles/handmade-blog</link>
            </item>
                   <item>
                <title>Using Doctrine's EntityRepository as a service is a bad idea</title>
                <description>Why Doctrine's ServiceEntityRepository, and not EntityRepository, should be only be ever used as a service</description>
-               <link>https://1823.pl/#using-entity-repository-as-a-service</link>
+               <link>/articles/using-entity-repository-as-a-service</link>
            </item>
                   <item>
-               <title>Changing the brightness and contrast using the application launcher</title>
+               <title>Changing your display's brightness using the system launcher</title>
                <description>Using application launcher to control the brightness and contrast of my screen</description>
-               <link>https://1823.pl/#changing-brightness-and-contrast-using-application-launcher</link>
+               <link>/articles/changing-your-displays-brightness-using-the-system-launcher</link>
            </item>
                   <item>
                <title>Controlling my screen using MCCS</title>
                <description>Leveraging MCCS to control the brightness of my screen</description>
-               <link>https://1823.pl/#controlling-my-screen-using-mccs</link>
+               <link>/articles/controlling-my-screen-using-mccs</link>
            </item>
           </channel>
 </rss>

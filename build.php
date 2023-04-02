@@ -59,7 +59,7 @@ $it = new RecursiveIteratorIterator(
  * Articles are written in Markdown and converted to HTML with Pandoc.
  *
  * Each article needs to be annotated with three special markers allowing
- * to specify the title, description and date and update date.
+ * to specify the title, description, creation date and update date.
  *
  * Markers are metadata that shouldn't be included in the generated
  * HTML output. They're defined using a neat trick utilizing the
@@ -267,6 +267,10 @@ function render_md_to_string(string $template_path, array $content = []): string
         ['file', '/dev/null', 'a']
     ];
 
+    /**
+     * Converting the Markdown to HTML as "self-contained" will inline all images.
+     * The resulting HTML will be fully standalone - wrapped in an <html> and <body> tags.
+     */
     $proccess = proc_open("pandoc --self-contained -f markdown -t html $template_path", $spec, $pipes, dirname($template_path));
 
     if (!is_resource($proccess)) {
@@ -280,6 +284,10 @@ function render_md_to_string(string $template_path, array $content = []): string
         throw new \RuntimeException("Converting markdown to html has failed. Make sure pandoc is installed.");
     }
 
+    /**
+     * We're obviously only interested in the contents of the <body> element.
+     * This elaborate piece of code gives us exactly that.
+     */
     $doc = new DOMDocument();
     @$doc->loadHTML($result);
     $elements = $doc->getElementsByTagName('body');
@@ -296,6 +304,12 @@ function render_md_to_string(string $template_path, array $content = []): string
         throw new \RuntimeException("Converting markdown to html has failed. Make sure pandoc is installed.");
     }
 
+    /**
+     * As the last thing, there's a chance a page written in Markdown will need some sort of
+     * dynamic content that needs to be injected during rendering. We'll try to replace
+     * all occurrences of {{key}} with the proper value.
+     * There's no error-checking here... yet.
+     */
     return str_replace(
         array_map(fn(string $value) => sprintf("{{%s}}", $value), array_keys($content)),
         array_values($content),

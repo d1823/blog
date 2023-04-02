@@ -167,6 +167,7 @@ header nav {
   background: var(--color-code-background);
   border: 1px dashed var(--color-code-border);
   padding: 0 .5em;
+  white-space: nowrap;
 }
 
 .header__title  {

@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="<?= $site_description ?>">
 
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@<?= $twitter_username ?>">
+    <meta property="og:url" content="<?= sprintf("%s/%s", rtrim($site_url, '/'), ltrim($page_url, '/')) ?>">
+    <meta property="og:title" content="<?= $site_title ?>">
+    <meta property="og:description" content="<?= $site_description ?>">
+
     <base href="<?= $site_url ?>">
 
     <title><?= $site_title ?></title>

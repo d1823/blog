@@ -160,6 +160,7 @@ render_php_to_path(
     "$src_dir/base.html.php",
     compact('site_description', 'site_url', 'styles', 'feed') + [
         'site_title' => "Blog - $site_title",
+        'twitter_username' => $twitter_username,
         'page_url' => '/',
         'content' => render_php_to_string(
             "$src_dir/_articles.html.php",
@@ -182,6 +183,7 @@ foreach ($pages as $page) {
             'page_url' => $page->url,
             'styles' => $styles,
             'feed' => $feed,
+            'twitter_username' => $twitter_username,
             'content' => render_php_to_string(
                 "$src_dir/_page.html.php",
                 [

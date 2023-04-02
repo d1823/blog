@@ -1,6 +1,7 @@
 [//]: # (TITLE: This blog is handmade)
 [//]: # (DESCRIPTION: Building a blog using simple tools.)
 [//]: # (DATE: 2023-01-28)
+[//]: # (UPDATE DATE: 2023-04-02)
 
 This blog is handmade. I mean, of course, it is, right? Well, it depends on how you define "handmade".
 For me, it means this blog is built using a set of readily available technologies and doesn't require me to install anything that isn't included in my distro's repositories.
@@ -34,35 +35,17 @@ function render_to_string(string $template_path, array $content = []): string
 What about the actual templates, though? As I said, it's been covered by PHP itself. Here's the template responsible for rendering the list of articles, one of which is the one you're currently reading. Something that normally requires third-party templating engines in other technologies, is handled natively by PHP. Nice!
 
 ```php
-<?php if (empty($articles)): ?>
-    <article>
-        <section>
-            No articles available yet.
-        </section>
-    </article>
-<?php endif; ?>
+<nav id="articles">
+    <?php foreach($articles as $index => $article): ?>
+    <div class="article-link">
+        <span class="article-link__date"><?= $article->creation_date->format('d/m/Y') ?></span>
 
-<?php foreach($articles as $article): ?>
-    <article id="<?= $article->id ?>">
-        <header>
-            <a href="#<?= $article->id ?>">
-                <h2><?= $article->title ?></h2>
-            </a>
-
-            <small>
-                from <time datetime="<?= $article->creation_time ?>"><?= $article->creation_human_time ?></time>
-            </small>
-
-            <?php if ($article->update_time): ?>
-                <small>, modified <time datetime="<?= $article->update_time ?>"><?= $article->update_human_time ?></time></small>
-            <?php endif; ?>
-        </header>
-
-        <section>
-            <?= $article->content ?>
-        </section>
-    </article>
-<?php endforeach; ?>
+        <a href="<?= $article->url ?>">
+            <?= $article->title ?>
+        </a>
+    </div>
+    <?php endforeach; ?>
+</nav>
 ```
 
 I followed the same approach while implementing the RSS support. Given that RSS is nothing else but a `application/rss+xml` link in the head section of a page and an XML document listing the articles, adding support for this format was equally trivial. Here's the whole template that generates [the RSS feed](/feed.xml).
@@ -92,4 +75,4 @@ As for converting the articles into HTML, I decided to use [pandoc](https://pand
 
 Aside from the above, the rest is handled by the build script. It's concatenating the stylesheets for inlining, parsing metadata, calling pandoc with each article to generate the HTML, copying over the images used in articles, and generating header identifiers that allow each article to be linked to. It also makes sure the CNAME file is present as this blog is hosted on GitHub pages with a custom domain.
 
-That's it! That's how this whole thing works. It's nothing advanced but I'm proud I've managed to find a solution that's bound to reliable software and doesn't require a whole toolchain to execute. If you want to see the whole picture, [the source code for this blog](https://github.com/d1823/blog) is public - feel free to check it out. It's heavily commented and easy to follow.
+That's it! That's how this whole thing works. It's nothing advanced, but I'm proud I've managed to find a solution that's bound to reliable software and doesn't require a whole toolchain to execute. If you want to see the whole picture, [the source code for this blog](https://github.com/d1823/blog) is public - feel free to check it out. It's heavily commented and easy to follow.

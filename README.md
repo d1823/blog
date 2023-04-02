@@ -1,5 +1,5 @@
 <a href="https://1823.pl/">
-  <img src="./.github/images/1823.png" align="right" alt="1823 logo" title="1823" height="60">
+  <img src="./.github/images/d1823.webp" align="right" alt="1823 logo" title="1823" height="60">
 </a>
 
 # README

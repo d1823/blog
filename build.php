@@ -261,8 +261,20 @@ function render_php_to_string(string $template_path, array $content = []): strin
 
 function render_md_to_string(string $template_path, array $content = []): string
 {
+    /**
+     * As the first thing, there's a chance a page written in Markdown will need some sort of
+     * dynamic content that needs to be injected during rendering. We'll try to replace
+     * all occurrences of {{key}} with the proper value.
+     * There's no error-checking here... yet.
+     */
+    $result = str_replace(
+        array_map(fn(string $value) => sprintf("{{%s}}", $value), array_keys($content)),
+        array_values($content),
+        file_get_contents($template_path)
+    );
+
     $spec = [
-        ['file', '/dev/null', 'r'],
+        ['pipe', 'r'],
         ['pipe', 'w'],
         ['file', '/dev/null', 'a']
     ];
@@ -271,11 +283,14 @@ function render_md_to_string(string $template_path, array $content = []): string
      * Converting the Markdown to HTML as "self-contained" will inline all images.
      * The resulting HTML will be fully standalone - wrapped in an <html> and <body> tags.
      */
-    $proccess = proc_open("pandoc --self-contained -f markdown -t html $template_path", $spec, $pipes, dirname($template_path));
+    $process = proc_open("pandoc --self-contained -f markdown -t html", $spec, $pipes, dirname($template_path));
 
-    if (!is_resource($proccess)) {
+    if (!is_resource($process)) {
         throw new \RuntimeException("Converting markdown to html has failed. Make sure pandoc is installed.");
     }
+
+    fwrite($pipes[0], $result);
+    fclose($pipes[0]);
 
     $result = stream_get_contents($pipes[1]);
     fclose($pipes[1]);
@@ -304,17 +319,7 @@ function render_md_to_string(string $template_path, array $content = []): string
         throw new \RuntimeException("Converting markdown to html has failed. Make sure pandoc is installed.");
     }
 
-    /**
-     * As the last thing, there's a chance a page written in Markdown will need some sort of
-     * dynamic content that needs to be injected during rendering. We'll try to replace
-     * all occurrences of {{key}} with the proper value.
-     * There's no error-checking here... yet.
-     */
-    return str_replace(
-        array_map(fn(string $value) => sprintf("{{%s}}", $value), array_keys($content)),
-        array_values($content),
-        $result
-    );
+    return $result;
 }
 
 function parse_title(string $pathname): string

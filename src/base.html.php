@@ -35,7 +35,7 @@
 
     <nav>
         <a href="/" <?= $page_url == '/' || str_starts_with($page_url, '/articles') ? 'class="link--current"' : '' ?>>Articles</a>
-        <a href="/projects" <?= $page_url == '/projects' ? 'class="link--current"' : '' ?>>Projects</a>
+        <a href="https://github.com/<?= $github_username ?>">Projects</a>
         <a href="/about" <?= $page_url == '/about' ? 'class="link--current"' : '' ?>>About</a>
     </nav>
 </header>

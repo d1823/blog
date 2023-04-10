@@ -14,6 +14,7 @@ $site_description = "d1823's programming ramblings";
 $site_url = $is_served_locally ? 'http://localhost:8080' : "https://1823.pl/";
 $email_address = "ramblings@1823.pl";
 $twitter_username = "_d1823";
+$github_username = "d1823";
 
 /**
  * BEGINNING THE BUILD PROCEDURE
@@ -161,6 +162,7 @@ render_php_to_path(
     compact('site_description', 'site_url', 'styles', 'feed') + [
         'site_title' => "Blog - $site_title",
         'twitter_username' => $twitter_username,
+        'github_username' => $github_username,
         'page_url' => '/',
         'content' => render_php_to_string(
             "$src_dir/_articles.html.php",
@@ -184,6 +186,7 @@ foreach ($pages as $page) {
             'styles' => $styles,
             'feed' => $feed,
             'twitter_username' => $twitter_username,
+            'github_username' => $github_username,
             'content' => render_php_to_string(
                 "$src_dir/_page.html.php",
                 [
@@ -192,7 +195,7 @@ foreach ($pages as $page) {
                     'update_date' => $page->update_date,
                     'content' => render_md_to_string(
                         $page->template_path,
-                        compact('email_address', 'twitter_username')
+                        compact('email_address', 'twitter_username', 'github_username')
                     )
                 ]
             )

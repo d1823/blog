@@ -82,7 +82,7 @@ header {
   margin-bottom: 5rem;
 }
 
-header #logo {
+header #logo, header #logo img {
   max-width: 10rem;
 }
 

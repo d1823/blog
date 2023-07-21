@@ -212,11 +212,13 @@ header nav {
 
 footer {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   margin: 4rem;
   font-size: .8rem;
+  gap: .5rem;
 }
 
 @media screen and (min-width: 1280px) {

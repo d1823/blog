@@ -62,9 +62,15 @@
 <?= $content ?>
 
 <footer>
-    Copyright &copy; 2020-<?php
-    echo date_format(new DateTime(), 'Y'); ?> 1823.pl&nbsp;&mdash;&nbsp;<a
-        href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+    <div>
+        This site uses cookie-disabled, fully-anonymized, self-hosted Matomo for usage tracking.
+    </div>
+
+    <div>
+        Copyright &copy; 2020-<?php
+        echo date_format(new DateTime(), 'Y'); ?> 1823.pl&nbsp;&mdash;&nbsp;<a
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a><br>
+    </div>
 </footer>
 
 </body>

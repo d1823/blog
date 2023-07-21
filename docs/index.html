@@ -796,11 +796,13 @@ header nav {
 
 footer {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   margin: 4rem;
   font-size: .8rem;
+  gap: .5rem;
 }
 
 @media screen and (min-width: 1280px) {
@@ -1021,8 +1023,14 @@ code span.wa {
     </nav>
 
 <footer>
-    Copyright &copy; 2020-2023 1823.pl&nbsp;&mdash;&nbsp;<a
-        href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>
+    <div>
+        This site uses cookie-disabled, fully-anonymized, self-hosted Matomo for usage tracking.
+    </div>
+
+    <div>
+        Copyright &copy; 2020-2023 1823.pl&nbsp;&mdash;&nbsp;<a
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a><br>
+    </div>
 </footer>
 
 </body>

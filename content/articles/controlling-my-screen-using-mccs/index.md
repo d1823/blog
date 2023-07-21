@@ -1,6 +1,7 @@
 [//]: # (TITLE: Controlling my screen using MCCS)
 [//]: # (DESCRIPTION: Leveraging MCCS to control the brightness of my screen)
 [//]: # (DATE: 2021-08-28)
+[//]: # (TAGS: mccs, ddcutil, brightness control, displaymgr)
 
 The window in my home office heads straight south. It means the amount of light I get in my room throughout the day varies from very little to a lot. In a way, it's great, because I don't feel like I'm losing the whole day sitting in a box with some artificial light. At the same time, adjusting my screen to match the light intensity in my room every two hours isn't the most convenient thing to do at all. For a long time I've been using f.lux on Windows and Redshift on Linux. These worked fine, although I've never been a fan of changing the color temperature to make the screen bearable. At some point I've dropped both of these and started adjusting the brightness and contrast levels of my screen manually. As you can imagine, it got tedious after a while. This article describes my way of solving it in a semi-automatic way.
 

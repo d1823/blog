@@ -2,6 +2,7 @@
 [//]: # (DESCRIPTION: Using application launcher to control the brightness and contrast of my screen)
 [//]: # (DATE: 2021-10-03)
 [//]: # (UPDATE DATE: 2023-01-11)
+[//]: # (TAGS: mccs, ddcutil, brightness control, displaymgr)
 
 In the article [Controlling my screen using MCCS](#controlling-my-screen-using-mccs) I've shown how to use ddcutil to change both contrast and brightness of your monitor without touching its physical controls. Here, I want to show you how I got it hooked with Pop!_OS (or any DE, really) application launcher for ease of use.
 

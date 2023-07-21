@@ -2,6 +2,7 @@
 [//]: # (DESCRIPTION: Building a blog using simple tools.)
 [//]: # (DATE: 2023-01-28)
 [//]: # (UPDATE DATE: 2023-04-02)
+[//]: # (TAGS: blog, handmade, diy)
 
 This blog is handmade. I mean, of course, it is, right? Well, it depends on how you define "handmade".
 For me, it means this blog is built using a set of readily available technologies and doesn't require me to install anything that isn't included in my distro's repositories.

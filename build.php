@@ -34,7 +34,7 @@ system("rm -fr $build_dir");
 system("mkdir -p $build_dir/fonts");
 
 /**
- * 2.1 CONCATENATING STYLESHEETS TOGETHER
+ * 2. CONCATENATING STYLESHEETS TOGETHER
  * --------------------------------------
  * Each stylesheet is defined in src/assets as a regular CSS file.
  * Since all files are concatenated into a one big stylesheet,
@@ -45,7 +45,7 @@ $styles = array_reduce(files_from_dir("$src_dir/assets", "css"), function (strin
 }, '');
 
 /**
- * 2.2 COPYING OVER THE SELF-HOSTED FONTS
+ * 3. COPYING OVER THE SELF-HOSTED FONTS
  * --------------------------------------
  * I'm not a fan of fonts being hosted externally. Since it's not
  * a big deal, I'm treating them as any other asset. Well, aside from inlining.
@@ -65,7 +65,7 @@ $it = new RecursiveIteratorIterator(
 );
 
 /**
- * 3. GENERATING THE CONTENT
+ * 4. GENERATING THE CONTENT
  * -------------------------
  * Articles are written in Markdown and converted to HTML with Pandoc.
  *
@@ -87,6 +87,7 @@ $it = new RecursiveIteratorIterator(
  * I personally feel all of this is really neat.
  */
 $pages = [];
+$tagsToPageUrls = [];
 
 foreach ($it as $file) {
     /*
@@ -127,6 +128,10 @@ foreach ($it as $file) {
 
     $title = parse_title($file->getRealPath());
     $description = parse_description($file->getRealPath());
+    $tags = array_map(fn(string $tag) => (object)[
+        'label' => $tag,
+        'url' => sprintf('tags/%s', str_replace(' ', '-', $tag))
+    ], parse_tags($file->getRealPath()));
 
     $creation_date = parse_date($file->getRealPath());
     $update_date = parse_update_date($file->getRealPath());
@@ -136,6 +141,7 @@ foreach ($it as $file) {
         'id',
         'title',
         'description',
+        'tags',
         'creation_date',
         'update_date',
         'url'
@@ -145,14 +151,14 @@ foreach ($it as $file) {
 $articles = array_filter($pages, fn(stdClass $page) => str_starts_with($page->url, '/articles'));
 
 /**
- * 4. SORTING ARTICLES USING THEIR DATES
+ * 5. SORTING ARTICLES USING THEIR DATES
  */
 usort($articles, function (object $article, object $other_article) {
     return $other_article->creation_date->getTimestamp() <=> $article->creation_date->getTimestamp();
 });
 
 /**
- * 5. CONFIGURING THE CNAME OF THE BLOG
+ * 6. CONFIGURING THE CNAME OF THE BLOG
  * ------------------------------------
  * My blog is hosted using GitHub Pages with a custom domain.
  * This file lets me publish it under a domain of my choice.
@@ -160,7 +166,7 @@ usort($articles, function (object $article, object $other_article) {
 file_put_contents("$build_dir/CNAME", parse_url($site_url, PHP_URL_HOST));
 
 /**
- * 6. RENDERING THE ARTICLES PAGE
+ * 7. RENDERING THE ARTICLES PAGE
  * ------------------------------
  * PHP started as a templating language and that's exactly how
  * I'm rendering this blog. You can find all the templates in
@@ -182,7 +188,39 @@ render_php_to_path(
 );
 
 /**
- * 7. RENDERING PAGES
+ * 8. RENDERING THE TAGS PAGES
+ * ---------------------------
+ * Each article can be annotated with a set of tags. This step groups
+ * the existing articles into sets ordered by creation date, and renders
+ * each of them into /tags/<canonical-tag>.html.
+ */
+$articles_per_tag = array_reduce($articles, static function(array $grouped_articles, stdClass $article) {
+    foreach ($article->tags as $tag) {
+        $grouped_articles[$tag->label][0] = $tag;
+        $grouped_articles[$tag->label][1][] = $article;
+    }
+    return $grouped_articles;
+}, []);
+
+foreach ($articles_per_tag as [$tag, $tagged_articles]) {
+    render_php_to_path(
+        "$build_dir/{$tag->url}.html",
+        "$src_dir/base.html.php",
+        compact('site_description', 'site_url', 'styles', 'feed') + [
+            'site_title' => "Articles for \"{$tag->label}\" - $site_title",
+            'twitter_username' => $twitter_username,
+            'github_username' => $github_username,
+            'page_url' => '/',
+            'content' => render_php_to_string(
+                "$src_dir/_articles.html.php",
+                ['articles' => $tagged_articles]
+            )
+        ]
+    );
+}
+
+/**
+ * 9. RENDERING PAGES
  */
 foreach ($pages as $page) {
     render_php_to_path(
@@ -201,6 +239,7 @@ foreach ($pages as $page) {
                 "$src_dir/_page.html.php",
                 [
                     'title' => $page->title,
+                    'tags' => $page->tags,
                     'creation_date' => $page->creation_date,
                     'update_date' => $page->update_date,
                     'content' => render_md_to_string(
@@ -214,7 +253,7 @@ foreach ($pages as $page) {
 }
 
 /**
- * 8. THE FEED
+ * 10. THE FEED
  * -----------
  * Did I mentioned I'm generating my own RSS feed?
  * It's a shame it's not that common anymore.
@@ -401,6 +440,18 @@ function parse_update_date(string $pathname): ?DateTimeInterface
     }
 
     return $date;
+}
+
+/**
+ * @return string[]
+ */
+function parse_tags(string $pathname): array
+{
+    try {
+        return array_map('trim', explode(',', parse_token("TAGS", $pathname)));
+    } catch (RuntimeException) {
+        return [];
+    }
 }
 
 function parse_token(string $marker, string $pathname): string

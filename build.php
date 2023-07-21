@@ -31,18 +31,28 @@ $feed = "feed.xml";
  * 1. CLEARING THE OLD BUILDS
  */
 system("rm -fr $build_dir");
-system("mkdir -p $build_dir");
+system("mkdir -p $build_dir/fonts");
 
 /**
- * 2. CONCATENATING STYLESHEETS TOGETHER
- * -------------------------------------
+ * 2.1 CONCATENATING STYLESHEETS TOGETHER
+ * --------------------------------------
  * Each stylesheet is defined in src/assets as a regular CSS file.
  * Since all files are concatenated into a one big stylesheet,
  * I'm using numbered prefixes to control their order.
  */
-$styles = array_reduce(files_from_dir("$src_dir/assets"), function (string $styles, string $asset_pathname): string {
+$styles = array_reduce(files_from_dir("$src_dir/assets", "css"), function (string $styles, string $asset_pathname): string {
     return $styles . file_get_contents($asset_pathname);
 }, '');
+
+/**
+ * 2.2 COPYING OVER THE SELF-HOSTED FONTS
+ * --------------------------------------
+ * I'm not a fan of fonts being hosted externally. Since it's not
+ * a big deal, I'm treating them as any other asset. Well, aside from inlining.
+ */
+foreach (files_from_dir("$src_dir/assets/fonts") as $font_pathname) {
+    copy($font_pathname, "$build_dir/fonts/" . pathinfo($font_pathname, PATHINFO_BASENAME));
+}
 
 /**
  * @var $it array<string, SplFileInfo>

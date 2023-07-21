@@ -210,10 +210,13 @@ foreach ($articles_per_tag as [$tag, $tagged_articles]) {
             'site_title' => "Articles for \"{$tag->label}\" - $site_title",
             'twitter_username' => $twitter_username,
             'github_username' => $github_username,
-            'page_url' => '/',
+            'page_url' => $tag->url,
             'content' => render_php_to_string(
                 "$src_dir/_articles.html.php",
-                ['articles' => $tagged_articles]
+                [
+                    'tag_label' => $tag->label,
+                    'articles' => $tagged_articles
+                ]
             )
         ]
     );

@@ -97,6 +97,7 @@ header nav {
 }
 
 #articles .article-link {
+  font-size: 1.4rem;
   display: flex;
   align-content: center;
 }

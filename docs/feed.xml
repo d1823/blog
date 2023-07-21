@@ -6,6 +6,11 @@
         <description>d1823's programming ramblings</description>
 
                    <item>
+               <title>Thoughts on exceptions as values</title>
+               <description>Thoughts on traditional exception-based error handling in comparison to Go's error-aware multi-value function return statements</description>
+               <link>/articles/thoughts-on-exceptions-as-values</link>
+           </item>
+                  <item>
                <title>This blog is handmade</title>
                <description>Building a blog using simple tools.</description>
                <link>/articles/handmade-blog</link>

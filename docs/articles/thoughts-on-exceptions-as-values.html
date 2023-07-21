@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="d1823's programming ramblings">
+    <meta name="description" content="Thoughts on traditional exception-based error handling in comparison to Go's error-aware multi-value function return statements">
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@_d1823">
-    <meta property="og:url" content="https://1823.pl/">
-    <meta property="og:title" content="Blog - d1823.pl">
-    <meta property="og:description" content="d1823's programming ramblings">
+    <meta property="og:url" content="https://1823.pl/articles/thoughts-on-exceptions-as-values">
+    <meta property="og:title" content="Thoughts on exceptions as values - d1823.pl">
+    <meta property="og:description" content="Thoughts on traditional exception-based error handling in comparison to Go's error-aware multi-value function return statements">
 
     <base href="https://1823.pl/">
 
-    <title>Blog - d1823.pl</title>
+    <title>Thoughts on exceptions as values - d1823.pl</title>
 
     <style>
         /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
@@ -958,7 +958,7 @@ code span.wa {
     <link
         href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TRZGKQzuoCGaoThZERRy1CkWoEGqFVh1MLv2CJg1Jiouj4Fpw8GOx6uDirKuDqyAIfoC4ujgpukiJ/0sKLWI8OO7Hu3uPu3eAUC8zzeoYBzTdNlOJuJjJropdrwhiAGEMIyQzy5iTpCR8x9c9Any9i/Es/3N/jl41ZzEgIBLPMsO0iTeIpzdtg/M+cYQVZZX4nHjMpAsSP3Jd8fiNc8FlgWdGzHRqnjhCLBbaWGljVjQ14iniqKrplC9kPFY5b3HWylXWvCd/YSinryxzneYQEljEEiSIUFBFCWXYiNGqk2IhRftxH/+g65fIpZCrBEaOBVSgQXb94H/wu1srPznhJYXiQOeL43yMAF27QKPmON/HjtM4AYLPwJXe8lfqwMwn6bWWFj0C+raBi+uWpuwBlztA/5Mhm7IrBWkK+TzwfkbflAXCt0DPmtdbcx+nD0CaukreAAeHwGiBstd93t3d3tu/Z5r9/QBS3nKamEF+kgAAAAZiS0dEAP0AcAA7rB2u5wAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAAd0SU1FB+cDGRUMGX8XZQgAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAC/0lEQVR42u3by2sTQRwH8O/MbJPYpm9bU6qJEm1BPbSCgiDqTWxFvGrFQ/8AsQcv/gFa8KQHqYgHwYuIePAgilI8ScG2qPVRsI0varQNTdMkbZKdGQ8VtbabrM86ye93HTbZ+ex35wXL5vrLNEq4OEq8CIAACIAACIAACIAACIAACKA0y/rvbmjLIMTqrcu2ZQd7oJMXKAEEQAAEQAAEQADFCqBliQPITJGtBEU7ROA4eN02sIomMKscYAw6l4LOxKFiQ1DRK9DZ218CMF88AGLNeYhwF1iZf0kb81aDeavBq0JAsBP2+HXIiW6wXLw4AKz1NyBCB1xKeWBt6gJWNUPNvoQwHUAE+tx3/vubWbsXMlpu9iDIPJ2wwod/A2+H2a8AD/UAlq/AVKeh0x+hs7OA8IBXBADhLYLzAL4ZVuP2/LPcpyHIsdPQ2VuLrwv1QgT3mQ3A67vzPn0ZHYA9untpg3oOO3IQWtyF1bzH3DGA1bQ5pz6Xhv3qZP50RE4BMmsuAPcHnTs3OQzIgQKrwEeQsWcGJ8BX55yA6UF3W4FkxFAAVr/siu9rx1LD7gDSY4YC8I0AY84dy7hLAHLTZgIwXpXnsSpAjbpLgG0ogLZH8ukA8Bf5gYj+kH8Ks9rcJcmqMXcW0Pac8x+V73T3I76QwQAZ5/eXVbe7S0Blq7kAasZ5CuMNLnZ5rAmiod3gBCScB0JeuQ4i0FfgEOUimNfgMUDFbwLKdu5gyzGI4DWA/xBzaxdE+I75u0HYDyGnnkI0OsSYCVgbDsEKdkClooCcB8oqFs4DmMBK1B8/EZJvLhU+2xce8KogeG0LuL95xTr/VwB0+jLku3u/dm0uBTn5xGwAALAjRyAnH/9kdHKwR85ARs4B0GYDAEnYL/ZDvr+/sA8oNHgm3iI7fAIqcRZ67ipUfNzQQXBRnmOwxzogJ46CN3WB17aC+erBhAdaZoDsLFTiNdTUA6hYL4DkN5BoP3hN+J8AMPpkpsSLAAiAAAiAAAiAAAiAAAigROszfw/sXyvnr2MAAAAASUVORK5CYII="
         rel="icon" type="image/x-icon">
-    <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Blog - d1823.pl">
+    <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Thoughts on exceptions as values - d1823.pl">
 
     <!-- Matomo -->
     <script>
@@ -995,38 +995,22 @@ code span.wa {
     </nav>
 </header>
 
-<nav id="articles">
-        <div class="article-link">
-        <span class="article-link__date">26/03/2023</span>
-
-        <a href="/articles/thoughts-on-exceptions-as-values">
-            Thoughts on exceptions as values        </a>
+<section class="page">
+    <div class="page__header">
+        <div class="header__meta"><a href="/">&laquo; back</a> &mdash; from 26/03/2023, tags:
+                                    <a href="tags/php">php</a>,                                     <a href="tags/go">go</a>,                                     <a href="tags/errors">errors</a>,                                     <a href="tags/error-handling">error handling</a>,                                     <a href="tags/short-thoughts">short thoughts</a>                                    </div>        <h1 class="header__title">Thoughts on exceptions as values</h1>
     </div>
-        <div class="article-link">
-        <span class="article-link__date">28/01/2023</span>
 
-        <a href="/articles/handmade-blog">
-            This blog is handmade        </a>
-    </div>
-        <div class="article-link">
-        <span class="article-link__date">20/01/2023</span>
+    <div class="page__content">
+        
+<p>I&#x2019;ve always had a problem with exception handling in PHP. From the very beginning of my career, I&#x2019;ve been told to and read that throwing an exception is dedicated for very exceptional situations (ex. when the argument doesn&#x2019;t meet some business requirements, or we receive an error from a call to a third-party service). Unfortunately, to me, that explanation was never enough, especially given that the same sources never really shown me what to do when an error is part of a result but at the same its representation requires a bit more than a simple <code>bool</code> type to indicate some meaning. I&#x2019;ve always felt that some errors should be treated as results, not as some exceptional cases that may, or may not be handled by the caller.</p>
+<p>At least in the PHP world, there&#x2019;s no language-level indication an exception can be thrown. If the piece of code you&#x2019;re calling isn&#x2019;t annotated with a set of <code>@throws</code> describing the exact exception you might get, you&#x2019;re pretty much blind and most developers will happily ignore that unknown scenario. In the end, what&#x2019;s the worst that could happen? It&#x2019;s going to be caught by a framework-level exception handler, right? Maybe. But leaving errors unhandled is never a good idea.</p>
+<p>To me, building a web application in Go seems to be related to the same kind of issues one might have while developing with PHP, and error handling is definitely one of them. Despite that, I&#x2019;d be lying if I said that it didn&#x2019;t feel slightly different. In Go, error-handling is not some invisible side effect like it is in PHP. You don&#x2019;t need to rely on comments to tell you a method might throw, or worry that the execution flow will suddenly be interrupted by an exception thrown ten layers down the stack, unless it&#x2019;s a panic. Even these situations are far and few between because of how panics are fundamentally treated <a href="https://go.dev/ref/spec#Run_time_panics">by the language</a> and developers. Making a function panic, means halting the normal execution flow and bypassing the typical error handling to let outer scopes deal with the issue, or let the program exit. Although it might not seem that much different than exception mechanism found in other languages, the whole error handling aspect differs in that there&#x2019;s an actual alternative that&#x2019;s dedicated to handling error conditions.</p>
+<p>This whole thing means that, suddenly, a constraint violation emitted by a DB call is no longer invisible and needs to be explicitly ignored if that&#x2019;s the developer&#x2019;s decision. It also means that a function can have multiple results where an error is one of them, and is no longer treated as a side effect that has to be consciously searched for. I&#x2019;ve got to say that I really like that.</p>
+<p>Doing the same in PHP is pretty much against the typical conventions you can find in most projects and the only language-level substitute we currently have is the distinction between thrown internally <a href="https://www.php.net/manual/en/class.error.php">Error</a>, and generally available <a href="https://www.php.net/manual/en/class.exception.php">Exception</a>. Unfortunately, from the developer&#x2019;s perspective, they&#x2019;re pretty much the same and are being handled uniformly through catching the <a href="https://www.php.net/manual/en/class.throwable.php">Throwable</a> interface. In result, they&#x2019;re both still invisible exceptions.</p>
 
-        <a href="/articles/using-entity-repository-as-a-service">
-            Using Doctrine's EntityRepository as a service is a bad idea        </a>
     </div>
-        <div class="article-link">
-        <span class="article-link__date">03/10/2021</span>
-
-        <a href="/articles/changing-your-displays-brightness-using-the-system-launcher">
-            Changing your display's brightness using the system launcher        </a>
-    </div>
-        <div class="article-link">
-        <span class="article-link__date">28/08/2021</span>
-
-        <a href="/articles/controlling-my-screen-using-mccs">
-            Controlling my screen using MCCS        </a>
-    </div>
-    </nav>
+</section>
 
 <footer>
     <div>

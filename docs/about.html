@@ -620,13 +620,13 @@ html, body {
   color: var(--color-foreground);
   display: flex;
   justify-content: center;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 body {
   width: 100%;
   box-sizing: border-box;
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
 a {
@@ -695,7 +695,7 @@ header nav {
   background: var(--color-highlight);
   color: var(--color-highlighted-foreground);
   font-weight: bold;
-  padding: 0 .4em;
+  padding: .2em .4em;
   margin-right: .2em;
   text-decoration: none;
 }
@@ -710,7 +710,7 @@ header nav {
   color: var(--color-muted-foreground-1);
   font-size: .7em;
   margin-right: .5em;
-  padding: 0 .5em;
+  padding: .2em .5em;
   font-weight: bold;
 }
 
@@ -806,9 +806,14 @@ footer {
   gap: .5rem;
 }
 
+footer > div {
+  text-align: center;
+}
+
 @media screen and (min-width: 1280px) {
   html, body {
     font-size: 16px;
+    padding: 1rem;
   }
 
   body {
@@ -834,6 +839,18 @@ footer {
 
   #articles {
     font-size: 1.4rem;
+  }
+
+  .header__title {
+    padding: 0 .4em;
+  }
+
+  .article-link a {
+    padding: 0 .4em;
+  }
+
+  .article-link .article-link__date {
+    padding: 0 .5em;
   }
 }
 a.sourceLine {

@@ -91,6 +91,15 @@ header nav {
   gap: 1rem;
 }
 
+nav a {
+  display: inline-flex;
+  gap: .5rem;
+}
+
+.icon__github {
+  fill: var(--color-foreground);
+}
+
 #articles {
   width: 100%;
   line-height: 1.6em;

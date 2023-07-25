@@ -483,3 +483,8 @@ function parse_token(string $marker, string $pathname): string
 
     throw new \RuntimeException("$pathname: missing a $marker");
 }
+
+function e(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES);
+}

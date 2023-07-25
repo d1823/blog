@@ -1,7 +1,7 @@
 [//]: # (TITLE: This blog is handmade)
 [//]: # (DESCRIPTION: Building a blog using simple tools.)
 [//]: # (DATE: 2023-01-28)
-[//]: # (UPDATE DATE: 2023-04-02)
+[//]: # (UPDATE DATE: 2023-07-25)
 [//]: # (TAGS: php, blog, handmade, diy)
 
 This blog is handmade. I mean, of course, it is, right? Well, it depends on how you define "handmade".
@@ -35,14 +35,23 @@ function render_to_string(string $template_path, array $content = []): string
 
 What about the actual templates, though? As I said, it's been covered by PHP itself. Here's the template responsible for rendering the list of articles, one of which is the one you're currently reading. Something that normally requires third-party templating engines in other technologies, is handled natively by PHP. Nice!
 
+One thing to note, though: despite its simplicity, we can't forget about escaping the output. Without it, any of the printed values can break the resulting document. Thanks to that one kind Reddit user that reminded me about that tiny-but-oh-so-important detail.
+
+```php
+function e(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES);
+}
+```
+
 ```php
 <nav id="articles">
     <?php foreach($articles as $index => $article): ?>
     <div class="article-link">
-        <span class="article-link__date"><?= $article->creation_date->format('d/m/Y') ?></span>
+        <span class="article-link__date"><?= e($article->creation_date->format('d/m/Y')) ?></span>
 
-        <a href="<?= $article->url ?>">
-            <?= $article->title ?>
+        <a href="<?= e($article->url) ?>">
+            <?= e($article->title) ?>
         </a>
     </div>
     <?php endforeach; ?>
@@ -55,15 +64,15 @@ I followed the same approach while implementing the RSS support. Given that RSS 
 <?xml version="1.0" ?>
 <rss version="2.0">
     <channel>
-        <title><?= $site_title ?></title>
-        <link><?= $site_url ?></link>
-        <description><?= $site_description ?></description>
+        <title><?= e($site_title) ?></title>
+        <link><?= e($site_url) ?></link>
+        <description><?= e($site_description) ?></description>
 
         <?php foreach($articles as $article): ?>
            <item>
-               <title><?= $article->title ?></title>
-               <description><?= $article->description ?></description>
-               <link><?= $article->url ?></link>
+               <title><?= e($article->title) ?></title>
+               <description><?= e($article->description) ?></description>
+               <link><?= e($article->url) ?></link>
            </item>
        <?php endforeach; ?>
    </channel>

@@ -3,16 +3,16 @@
     <channel>
         <title>d1823.pl</title>
         <link>https://1823.pl/</link>
-        <description>d1823's programming ramblings</description>
+        <description>d1823&#039;s programming ramblings</description>
 
                    <item>
                <title>Browser Matcher: HTTP(s) scheme handler</title>
-               <description>A middleman between the link you've clicked and your default browser(s).</description>
+               <description>A middleman between the link you&#039;ve clicked and your default browser(s).</description>
                <link>/articles/routing-urls-in-multi-browser-environment</link>
            </item>
                   <item>
                <title>Thoughts on exceptions as values</title>
-               <description>Thoughts on traditional exception-based error handling in comparison to Go's error-aware multi-value function return statements</description>
+               <description>Thoughts on traditional exception-based error handling in comparison to Go&#039;s error-aware multi-value function return statements</description>
                <link>/articles/thoughts-on-exceptions-as-values</link>
            </item>
                   <item>
@@ -21,12 +21,12 @@
                <link>/articles/handmade-blog</link>
            </item>
                   <item>
-               <title>Using Doctrine's EntityRepository as a service is a bad idea</title>
-               <description>Why Doctrine's ServiceEntityRepository, and not EntityRepository, should be only be ever used as a service</description>
+               <title>Using Doctrine&#039;s EntityRepository as a service is a bad idea</title>
+               <description>Why Doctrine&#039;s ServiceEntityRepository, and not EntityRepository, should be only be ever used as a service</description>
                <link>/articles/using-entity-repository-as-a-service</link>
            </item>
                   <item>
-               <title>Changing your display's brightness using the system launcher</title>
+               <title>Changing your display&#039;s brightness using the system launcher</title>
                <description>Using application launcher to control the brightness and contrast of my screen</description>
                <link>/articles/changing-your-displays-brightness-using-the-system-launcher</link>
            </item>

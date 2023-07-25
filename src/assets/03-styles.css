@@ -88,7 +88,7 @@ header #logo, header #logo img {
 
 header nav {
   display: inline-flex;
-  gap: 1rem;
+  gap: .5rem;
 }
 
 nav a {
@@ -98,6 +98,8 @@ nav a {
 
 .icon__github {
   fill: var(--color-foreground);
+  width: 1rem;
+  height: auto;
 }
 
 #articles {
@@ -244,7 +246,6 @@ footer > div {
   body {
     width: 1024px;
   }
-
 
   .page__content > pre,
   .page__content > .sourceCode,

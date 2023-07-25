@@ -6,6 +6,11 @@
         <description>d1823's programming ramblings</description>
 
                    <item>
+               <title>Browser Matcher: HTTP(s) scheme handler</title>
+               <description>A middleman between the link you've clicked and your default browser(s).</description>
+               <link>/articles/routing-urls-in-multi-browser-environment</link>
+           </item>
+                  <item>
                <title>Thoughts on exceptions as values</title>
                <description>Thoughts on traditional exception-based error handling in comparison to Go's error-aware multi-value function return statements</description>
                <link>/articles/thoughts-on-exceptions-as-values</link>

@@ -451,7 +451,9 @@ function parse_update_date(string $pathname): ?DateTimeInterface
 function parse_tags(string $pathname): array
 {
     try {
-        return array_map('trim', explode(',', parse_token("TAGS", $pathname)));
+        $tags = array_map('trim', explode(',', parse_token("TAGS", $pathname)));
+        sort($tags);
+        return $tags;
     } catch (RuntimeException) {
         return [];
     }

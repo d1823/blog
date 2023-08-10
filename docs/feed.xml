@@ -6,6 +6,11 @@
         <description>d1823&#039;s programming ramblings</description>
 
                    <item>
+               <title>Web Components as native form elements</title>
+               <description>Creating custom Web Components as native form elements.</description>
+               <link>/articles/web-components-as-native-form-elements</link>
+           </item>
+                  <item>
                <title>Browser Matcher: HTTP(s) scheme handler</title>
                <description>A middleman between the link you&#039;ve clicked and your default browser(s).</description>
                <link>/articles/routing-urls-in-multi-browser-environment</link>

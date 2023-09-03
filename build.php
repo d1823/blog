@@ -11,7 +11,7 @@ $is_served_locally = $argc > 1 && $argv[1] === '--local';
  */
 $site_title = "d1823.pl";
 $site_description = "d1823's programming ramblings";
-$site_url = $is_served_locally ? 'http://localhost:8080' : "https://1823.pl/";
+$site_url = $is_served_locally ? 'http://localhost:9980' : "https://1823.pl/";
 $email_address = "ramblings@1823.pl";
 $twitter_username = "_d1823";
 $github_username = "d1823";

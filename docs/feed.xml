@@ -6,6 +6,11 @@
         <description>d1823&#039;s programming ramblings</description>
 
                    <item>
+               <title>Implementing a ClickHouse output plugin for Telegraf in Go</title>
+               <description>A process of implementing a Go-based ClickHouse output plugin for Telegraf, along with the surprises and pitfalls.</description>
+               <link>/articles/implementing-a-clickhouse-output-plugin-for-telegraf</link>
+           </item>
+                  <item>
                <title>Web Components as native form elements</title>
                <description>Creating custom Web Components as native form elements.</description>
                <link>/articles/web-components-as-native-form-elements</link>

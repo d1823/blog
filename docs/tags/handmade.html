@@ -678,6 +678,7 @@ header nav {
 nav a {
   display: inline-flex;
   gap: .5rem;
+  padding: .3rem;
 }
 
 .icon__github {
@@ -688,13 +689,11 @@ nav a {
 
 #articles {
   width: 100%;
-  line-height: 1.6em;
 }
 
 #articles .article-link {
   font-size: 1.4rem;
   display: flex;
-  align-content: center;
 }
 
 #articles .article-link:not(:first-of-type) {
@@ -702,11 +701,12 @@ nav a {
 }
 
 .article-link a {
-  display: inline-block;
+  display: flex;
+  align-items: center;
   background: var(--color-highlight);
   color: var(--color-highlighted-foreground);
   font-weight: bold;
-  padding: .2em .4em;
+  padding: .2em .4em 0 .4em;
   margin-right: .2em;
   text-decoration: none;
 }
@@ -717,11 +717,13 @@ nav a {
 }
 
 .article-link .article-link__date {
+  display: flex;
+  align-items: center;
   background: var(--color-muted-background);
   color: var(--color-muted-foreground-1);
   font-size: .7em;
   margin-right: .5em;
-  padding: .2em .5em;
+  padding: .2em .5em 0 .5em;
   font-weight: bold;
 }
 
@@ -862,7 +864,7 @@ footer > div {
   }
 
   .article-link a {
-    padding: 0 .4em;
+    padding: .3em .4em .1em .4em;
   }
 
   .article-link .article-link__date {

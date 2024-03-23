@@ -6,6 +6,11 @@
         <description>d1823&#039;s programming ramblings</description>
 
                    <item>
+               <title>Avoiding Pitfalls with Doctrine ORM: The Impact of Type Hints</title>
+               <description>How incorrect type hints can affect the performance of your persistence layer.</description>
+               <link>/articles/importance-of-type-hints-with-doctrines-change-detection</link>
+           </item>
+                  <item>
                <title>Enabling theme auto-switching in tmux</title>
                <description>Enabling support for Freedesktop&#039;s color scheme preference in tmux.</description>
                <link>/articles/color-scheme-preference-in-unsupported-applications</link>
@@ -36,7 +41,7 @@
                <link>/articles/handmade-blog</link>
            </item>
                   <item>
-               <title>Using Doctrine&#039;s EntityRepository as a service is a bad idea</title>
+               <title>Avoiding Pitfalls with Doctrine ORM: Using EntityRepository as a service is a bad idea</title>
                <description>Why Doctrine&#039;s ServiceEntityRepository, and not EntityRepository, should be only be ever used as a service</description>
                <link>/articles/using-entity-repository-as-a-service</link>
            </item>

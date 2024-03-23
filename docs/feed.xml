@@ -6,6 +6,11 @@
         <description>d1823&#039;s programming ramblings</description>
 
                    <item>
+               <title>Enabling theme auto-switching in tmux</title>
+               <description>Enabling support for Freedesktop&#039;s color scheme preference in tmux.</description>
+               <link>/articles/color-scheme-preference-in-unsupported-applications</link>
+           </item>
+                  <item>
                <title>Implementing a ClickHouse output plugin for Telegraf in Go</title>
                <description>A process of implementing a Go-based ClickHouse output plugin for Telegraf, along with the surprises and pitfalls.</description>
                <link>/articles/implementing-a-clickhouse-output-plugin-for-telegraf</link>

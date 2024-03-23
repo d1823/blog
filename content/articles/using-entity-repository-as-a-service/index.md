@@ -1,8 +1,8 @@
-[//]: # (TITLE: Using Doctrine's EntityRepository as a service is a bad idea)
+[//]: # (TITLE: Avoiding Pitfalls with Doctrine ORM: Using EntityRepository as a service is a bad idea)
 [//]: # (DESCRIPTION: Why Doctrine's ServiceEntityRepository, and not EntityRepository, should be only be ever used as a service)
 [//]: # (DATE: 2023-01-20)
 [//]: # (UPDATE DATE: 2023-09-05)
-[//]: # (TAGS: php, symfony, entity manager, service repository)
+[//]: # (TAGS: php, symfony, doctrine, entity manager, service repository)
 
 If you're using Symfony, you've definitely written a Doctrine repository at some point. If you've been using Symfony long enough, you've probably seen the introduction of *ServiceEntityRepository* that complemented the default *EntityRepository* base class. Its initial goal was to ease the use of repositories with service containers, instead of being tied directly to Doctrine, but that's not what I want to talk about. I really want to talk about the implications of using a repository extending the *EntityRepository* rather than the *ServiceEntityRepository*.
 

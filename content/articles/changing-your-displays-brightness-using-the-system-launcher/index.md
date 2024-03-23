@@ -4,7 +4,7 @@
 [//]: # (UPDATE DATE: 2023-01-11)
 [//]: # (TAGS: mccs, ddcutil, brightness control, displaymgr)
 
-In the article [Controlling my screen using MCCS](#controlling-my-screen-using-mccs) I've shown how to use ddcutil to change both contrast and brightness of your monitor without touching its physical controls. Here, I want to show you how I got it hooked with Pop!_OS (or any DE, really) application launcher for ease of use.
+In the article [Controlling my screen using MCCS](/articles/controlling-my-screen-using-mccs) I've shown how to use ddcutil to change both contrast and brightness of your monitor without touching its physical controls. Here, I want to show you how I got it hooked with Pop!_OS (or any DE, really) application launcher for ease of use.
 
 Most Desktop Environments allow the user to quickly launch an application by showing a launcher. Whether it's something similiar to macOS's Spotlight, or Windows's Menu Start, it will allow you to launch a new application with just a few keystrokes.
 

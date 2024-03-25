@@ -1,6 +1,7 @@
 [//]: # (TITLE: Avoiding Pitfalls with Doctrine ORM: The Impact of Type Hints)
 [//]: # (DESCRIPTION: How incorrect type hints can affect the performance of your persistence layer.)
 [//]: # (DATE: 2024-03-23)
+[//]: # (UPDATE DATE: 2024-03-24)
 [//]: # (TAGS: php, doctrine, entity manager, unit of work)
 
 Doctrine tends to be a pretty forgiving ORM. Despite it's rigid structure and reliance on complex class hierarchies, it has a bunch
@@ -41,7 +42,31 @@ $ bin/console doctrine:mapping:info
  [OK]   App\Entity\Book
 ```
 
-Well... not much. That's despite the column definition clearly being incorrect. Let's try to use it.
+Well... not much. Let's also try the schema validation.
+
+```sh
+$ bin/console doctrine:schema:validate
+
+Mapping
+-------
+
+ [FAIL] The entity-class App\Entity\Book mapping is invalid:
+ * The field 'App\Entity\Book#price' has the property type 'float' that differs from the metadata field type 'string' returned by the 'decimal' DBAL type.
+
+
+Database
+--------
+
+ [OK] The database schema is in sync with the mapping files.
+
+```
+
+This one successfully reports an issue. It's important to note that it will do that only if you're keeping your dependencies relatively up
+to date. The schema validation [has been extended to look for this violation](https://github.com/doctrine/orm/pull/10946) pretty recently
+(at least, relative to this very moment). Thanks to [greg0ire](https://github.com/greg0ire) for pointing that out!
+
+But, what if your dependencies are out of date and Doctrine reports nothing, or what if you don't use the schema validation tool at all.
+What's the big deal? Let's try it out.
 
 ```php
 <?php

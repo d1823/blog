@@ -55,5 +55,20 @@
                <description>Leveraging MCCS to control the brightness of my screen</description>
                <link>/articles/controlling-my-screen-using-mccs</link>
            </item>
+                  <item>
+               <title>DLLExport with naked functions</title>
+               <description>Creating naked functions in C/C++ with MinGW on x86.</description>
+               <link>/articles/dllexport-with-naked-functions</link>
+           </item>
+                  <item>
+               <title>Vimming</title>
+               <description>The beginnings of my journey with Vim.</description>
+               <link>/articles/vimming</link>
+           </item>
+                  <item>
+               <title>Binary files, creating your own file format</title>
+               <description>Creating a very basic binary file format.</description>
+               <link>/articles/binary-files</link>
+           </item>
           </channel>
 </rss>

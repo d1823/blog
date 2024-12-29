@@ -829,6 +829,13 @@ footer > div {
   border: 3px solid var(--color-highlight);
 }
 
+blockquote {
+  border-left: 5px var(--color-highlight) solid;
+  margin-left: 0;
+  padding-left: 1.1rem;
+  font-style: italic;
+}
+
 @media screen and (min-width: 1280px) {
   html, body {
     font-size: 16px;
@@ -1048,141 +1055,213 @@ code span.wa {
 
     <div class="page__content">
         
-<p>Telegraf describes itself as a server-based agent for collecting and sending all metrics and events from databases, systems &amp; IoT sensors. ClickHouse, on the other hand, is a column-oriented open-source database designed for real-time apps and analytics.</p>
-<p>One of the clients I worked for has been using ClickHouse to store all kinds of telemetry captured throughout the infrastructure. Initially, they used InfluxDB as the storage, but as the infrastructure grew, they quickly found out they needed a more powerful solution than InfluxDB, and ClickHouse became a natural choice.</p>
-<p>Its extreme performance and a collection of high-quality integrations with various systems have placed it at the very top of the ranking while they were evaluating the choices. One caveat, at the time, was the lack of any kind of mature integration between two of these systems.</p>
+<p>Telegraf describes itself as a server-based agent for collecting and
+sending all metrics and events from databases, systems &amp; IoT
+sensors. ClickHouse, on the other hand, is a column-oriented open-source
+database designed for real-time apps and analytics.</p>
+<p>One of the clients I worked for has been using ClickHouse to store
+all kinds of telemetry captured throughout the infrastructure.
+Initially, they used InfluxDB as the storage, but as the infrastructure
+grew, they quickly found out they needed a more powerful solution than
+InfluxDB, and ClickHouse became a natural choice.</p>
+<p>Its extreme performance and a collection of high-quality integrations
+with various systems have placed it at the very top of the ranking while
+they were evaluating the choices. One caveat, at the time, was the lack
+of any kind of mature integration between two of these systems.</p>
 <h3 id="figuring-out-the-issues">Figuring out the issues</h3>
-<p>Although Telegraf supported a lot of storage engines (called output plugins), it lacked <strong>proper</strong> support for ClickHouse. Well, to be completely honest, ClickHouse was supported through their SQL output plugin, but it was built on top of the Go&#x2019;s <a href="https://pkg.go.dev/database/sql">database/sql</a> API and suffered from a lot of shortcomings that affected its performance:</p>
+<p>Although Telegraf supported a lot of storage engines (called output
+plugins), it lacked <strong>proper</strong> support for ClickHouse.
+Well, to be completely honest, ClickHouse was supported through their
+SQL output plugin, but it was built on top of the Go&rsquo;s <a href="https://pkg.go.dev/database/sql">database/sql</a> API and suffered
+from a lot of shortcomings that affected its performance:</p>
 <ul>
-<li>it doesn&#x2019;t support using the <a href="https://github.com/ClickHouse/ch-go">ch-go</a> package designed for very fast data block streaming with low resources overhead</li>
-<li>it doesn&#x2019;t support <a href="https://clickhouse.com/docs/en/optimize/asynchronous-inserts">asynchronous inserts</a> to lower the number of disk writes on the database side</li>
-<li>it doesn&#x2019;t support <a href="https://github.com/influxdata/telegraf/blob/v1.27.4/plugins/outputs/sql/sql.go#L238-L256">metrics batching so every metric results in a insert statement</a></li>
+<li>it doesn&rsquo;t support using the <a href="https://github.com/ClickHouse/ch-go">ch-go</a> package designed
+for very fast data block streaming with low resources overhead</li>
+<li>it doesn&rsquo;t support <a href="https://clickhouse.com/docs/en/optimize/asynchronous-inserts">asynchronous
+inserts</a> to lower the number of disk writes on the database side</li>
+<li>it doesn&rsquo;t support <a href="https://github.com/influxdata/telegraf/blob/v1.27.4/plugins/outputs/sql/sql.go#L238-L256">metrics
+batching so every metric results in a insert statement</a></li>
 </ul>
-<p>All of that affected the memory usage of the Telegraf itself, and generated a huge number of disk-writes on the ClickHouse side, affecting the performance of the whole server.</p>
-<p>That setup has been running in the production for a while, but eventually, a decision was made to take the matter into our own hands and implement a dedicated output plugin that would use some of ClickHouse-specific features, lowering the overall footprint on both sides of the integration.</p>
+<p>All of that affected the memory usage of the Telegraf itself, and
+generated a huge number of disk-writes on the ClickHouse side, affecting
+the performance of the whole server.</p>
+<p>That setup has been running in the production for a while, but
+eventually, a decision was made to take the matter into our own hands
+and implement a dedicated output plugin that would use some of
+ClickHouse-specific features, lowering the overall footprint on both
+sides of the integration.</p>
 <h3 id="writing-the-plugin">Writing the plugin</h3>
-<p>The pretty cool thing about Telegraf in itself is that it&#x2019;s heavily extendable. Every source and every storage engine integration is implemented as a plugin. As such, it can be brought into the project, becoming part of the source tree, or be implemented as an external plugin, integrated with telegraf through its <a href="https://github.com/influxdata/telegraf/blob/master/plugins/inputs/execd/README.md">execd wrapper</a>.</p>
-<p>The communication is performed over the stdin/stdout as metrics are serialized into <a href="https://docs.influxdata.com/influxdb/v2.7/reference/syntax/line-protocol/">Influx Line Protocol</a>. For Go developers, there&#x2019;s a convenient <a href="https://github.com/influxdata/telegraf/blob/master/plugins/common/shim/README.md">execd shim package</a> that can be used to bootstrap the development of the desired integration. It takes care of reading &amp; writing the metrics using the native protocol, while the plugin itself needs to fulfill the following simplified interface:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">type</span> Output <span class="kw">interface</span> {</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  SampleConfig() <span class="dt">string</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  Connect() <span class="dt">error</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  Close() <span class="dt">error</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  Write(metrics []Metric) <span class="dt">error</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Unfortunately, at the time of writing this article, the way the execd shim handles the incoming metrics prevents the implementations from processing them in any other way than one-by-one - a <a href="https://github.com/influxdata/telegraf/issues/11902">bug known to the maintainers, but yet to be resolved</a>, caused by <a href="https://github.com/influxdata/telegraf/blob/master/plugins/common/shim/output.go#L41-L50">this simple loop</a>. In my case, the most obvious workaround involved a timer-based buffer that called the output plugin with a list of accumulated metrics - something along these lines:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="kw">func</span> (s *customShim) RunOutput() <span class="dt">error</span> {</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>  <span class="co">// omitted for brevity</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>  ch := <span class="bu">make</span>(<span class="kw">chan</span> telegraf.Metric, bufferSize)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>  wg := &amp;sync.WaitGroup{}</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>  wg.Add(<span class="dv">1</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a>  <span class="kw">go</span> <span class="kw">func</span>() {</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a>    <span class="kw">defer</span> wg.Done()</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a>    t := time.NewTicker(s.d)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a>    <span class="kw">defer</span> t.Stop()</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a>    metrics := <span class="bu">make</span>([]telegraf.Metric, <span class="dv">0</span>, bufferSize)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a>    <span class="kw">defer</span> <span class="kw">func</span>() {</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true"></a>      <span class="kw">if</span> err = s.Output.Write(metrics); err != <span class="ot">nil</span> {</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true"></a>        fmt.Fprintf(os.Stderr, <span class="st">"Failed to write metrics: %s</span><span class="ch">\n</span><span class="st">"</span>, err)</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true"></a>      }</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true"></a>    }()</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true"></a></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true"></a>  loop:</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a>    <span class="kw">for</span> {</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a>      <span class="kw">select</span> {</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a>      <span class="kw">case</span> m, ok := &lt;-ch:</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a>        <span class="kw">if</span> !ok {</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a>          <span class="kw">break</span> loop</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a>        }</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true"></a>        metrics = <span class="bu">append</span>(metrics, m)</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true"></a>      <span class="kw">case</span> &lt;-t.C:</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true"></a>        <span class="kw">if</span> err = s.Output.Write(metrics); err != <span class="ot">nil</span> {</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true"></a>          fmt.Fprintf(os.Stderr, <span class="st">"Failed to write metrics: %s</span><span class="ch">\n</span><span class="st">"</span>, err)</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true"></a>        }</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true"></a>        metrics = metrics[:<span class="dv">0</span>]</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true"></a>      }</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true"></a>    }</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true"></a>  }()</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true"></a></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true"></a>  scanner := bufio.NewScanner(os.Stdin)</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true"></a>  <span class="kw">for</span> scanner.Scan() {</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true"></a>    m, err := parser.ParseLine(scanner.Text())</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true"></a>    <span class="kw">if</span> err != <span class="ot">nil</span> {</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true"></a>      fmt.Fprintf(os.Stderr, <span class="st">"Failed to parse metric: %s</span><span class="ch">\n</span><span class="st">"</span>, err)</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true"></a>      <span class="kw">continue</span></span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true"></a>    }</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true"></a></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true"></a>    ch &lt;- m</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true"></a>  }</span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true"></a></span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true"></a>  <span class="bu">close</span>(ch)</span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true"></a>  wg.Wait()</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true"></a></span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true"></a>}</span></code></pre></div>
-<p>The original intention of the authors behind the Telegraf project was to use it with their main product - InfluxDB, a time-series database where data is saved as a key-value set of fields and tags. One of the side-effects is the fact that it does not require an explicit schema, which is ideal for Telegraf, because metrics generated by input plugins are not bound to any schema either. That&#x2019;s not the case for any kind of SQL database, ClickHouse included. Creating the schema and keeping it up to date has to be part of the feature set.</p>
-<p>Fortunately, doing it correctly was not a difficult task. To make things simple, each type of metric will be stored in a separate table. Given the interface of the output plugin, a quick scan over the given slice of metrics was enough to gather enough information about fields and tags that had to be supported by the corresponding table as columns. In the meantime, we also had to look at each column&#x2019;s value. A simple mapping from native Go types to their ClickHouse counterparts was enough to get this going.</p>
-<p>Before constructing the insert query, we can use all that information to either create or alter the relevant table. The only thing I haven&#x2019;t decided to pursue was altering the existing columns - doing so could lead to a potential data loss and as such would be difficult to implement safely. To be honest, I&#x2019;m not sure it&#x2019;s even supported by the InfluxDB, let alone any other output plugin.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">func</span> (s *Clickhouse) Write(metrics []telegraf.Metric) <span class="dt">error</span> {</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>  tableCols := <span class="bu">make</span>(<span class="kw">map</span>[<span class="dt">string</span>]<span class="kw">map</span>[<span class="dt">string</span>]Datatype)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>  tableColValues := <span class="bu">make</span>(<span class="kw">map</span>[<span class="dt">string</span>][]<span class="kw">map</span>[<span class="dt">string</span>]<span class="kw">interface</span>{})</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>  <span class="kw">for</span> _, metric := <span class="kw">range</span> metrics {</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>    batch := <span class="bu">make</span>(<span class="kw">map</span>[<span class="dt">string</span>]<span class="kw">interface</span>{})</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>    <span class="kw">if</span> tableCols[metric.Name()] == <span class="ot">nil</span> {</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>      tableCols[metric.Name()] = <span class="bu">make</span>(<span class="kw">map</span>[<span class="dt">string</span>]Datatype, <span class="bu">len</span>(metric.Tags())+<span class="bu">len</span>(metric.FieldList())+<span class="dv">1</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>    }</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>    <span class="kw">if</span> s.TimestampColumn != <span class="st">""</span> {</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>      tableCols[metric.Name()][s.TimestampColumn] = resolveDatatype(metric.Time())</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>      batch[s.TimestampColumn] = metric.Time()</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>    }</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>    <span class="kw">for</span> column, value := <span class="kw">range</span> metric.Tags() {</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>      tableCols[metric.Name()][column] = resolveDatatype(value)</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>      batch[column] = value</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>    }</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a>    <span class="kw">for</span> column, value := <span class="kw">range</span> metric.Fields() {</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a>      tableCols[metric.Name()][column] = resolveDatatype(value)</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a>      batch[column] = value</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a>    }</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a>    tableColValues[metric.Name()] = <span class="bu">append</span>(tableColValues[metric.Name()], batch)</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>  }</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a>  <span class="co">// omitted for brevity</span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a>}</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">func</span> resolveDatatype(value <span class="kw">interface</span>{}) Datatype {</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>    <span class="kw">var</span> datatype Datatype</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    <span class="kw">switch</span> value.(<span class="kw">type</span>) {</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>    <span class="kw">case</span> <span class="dt">int64</span>:</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>        datatype = Integer</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>    <span class="kw">case</span> <span class="dt">uint64</span>:</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>        datatype = Unsigned</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>    <span class="kw">case</span> <span class="dt">float64</span>:</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>        datatype = Real</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>    <span class="kw">case</span> <span class="dt">string</span>:</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>        datatype = Text</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>    <span class="kw">case</span> <span class="dt">bool</span>:</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>        datatype = Bool</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>    <span class="kw">case</span> time.Time:</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>        datatype = Timestamp</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>    <span class="kw">default</span>:</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>        datatype = Default</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>    }</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a>    <span class="kw">return</span> datatype</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a>}</span></code></pre></div>
-<p>As for actually writing the metrics to the database, I used the <a href="https://clickhouse.com/docs/en/optimize/asynchronous-inserts">Asynchronous Inserts</a> functionality. In short, it enables ClickHouse to memory-buffer the inserted values before writing them to disk. It takes care of the issue created when it has to handle a lot of small and frequent inserts. To increase the performance of the whole solution, I&#x2019;ve made sure each batch of metrics converts into a single insert query per table. That way, even if I decide the async writes should no longer be enabled, the plugin will still execute - at most - a single insertion per table per second.</p>
-<h3 id="lets-sum-it-up">Let&#x2019;s sum it up!</h3>
-<p>It took me around two days to implement and deploy this solution to production. I&#x2019;ve lowered the memory footprint on the Telegraf side, and solved the excessive disk writes issue on the ClickHouse side. I&#x2019;ve also learned a bunch about Telegraf. My main takeaway from this little project is this - don&#x2019;t be afraid of writing integrations yourself, because it might actually be worth it.</p>
+<p>The pretty cool thing about Telegraf in itself is that it&rsquo;s heavily
+extendable. Every source and every storage engine integration is
+implemented as a plugin. As such, it can be brought into the project,
+becoming part of the source tree, or be implemented as an external
+plugin, integrated with telegraf through its <a href="https://github.com/influxdata/telegraf/blob/master/plugins/inputs/execd/README.md">execd
+wrapper</a>.</p>
+<p>The communication is performed over the stdin/stdout as metrics are
+serialized into <a href="https://docs.influxdata.com/influxdb/v2.7/reference/syntax/line-protocol/">Influx
+Line Protocol</a>. For Go developers, there&rsquo;s a convenient <a href="https://github.com/influxdata/telegraf/blob/master/plugins/common/shim/README.md">execd
+shim package</a> that can be used to bootstrap the development of the
+desired integration. It takes care of reading &amp; writing the metrics
+using the native protocol, while the plugin itself needs to fulfill the
+following simplified interface:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Output <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  SampleConfig<span class="op">()</span> <span class="dt">string</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  Connect<span class="op">()</span> <span class="dt">error</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  Close<span class="op">()</span> <span class="dt">error</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  Write<span class="op">(</span>metrics <span class="op">[]</span>Metric<span class="op">)</span> <span class="dt">error</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>Unfortunately, at the time of writing this article, the way the execd
+shim handles the incoming metrics prevents the implementations from
+processing them in any other way than one-by-one - a <a href="https://github.com/influxdata/telegraf/issues/11902">bug known to
+the maintainers, but yet to be resolved</a>, caused by <a href="https://github.com/influxdata/telegraf/blob/master/plugins/common/shim/output.go#L41-L50">this
+simple loop</a>. In my case, the most obvious workaround involved a
+timer-based buffer that called the output plugin with a list of
+accumulated metrics - something along these lines:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>s <span class="op">*</span>customShim<span class="op">)</span> RunOutput<span class="op">()</span> <span class="dt">error</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">// omitted for brevity</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  ch <span class="op">:=</span> <span class="bu">make</span><span class="op">(</span><span class="kw">chan</span> telegraf<span class="op">.</span>Metric<span class="op">,</span> bufferSize<span class="op">)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  wg <span class="op">:=</span> <span class="op">&amp;</span>sync<span class="op">.</span>WaitGroup<span class="op">{}</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  wg<span class="op">.</span>Add<span class="op">(</span><span class="dv">1</span><span class="op">)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">go</span> <span class="kw">func</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">defer</span> wg<span class="op">.</span>Done<span class="op">()</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    t <span class="op">:=</span> time<span class="op">.</span>NewTicker<span class="op">(</span>s<span class="op">.</span>d<span class="op">)</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">defer</span> t<span class="op">.</span>Stop<span class="op">()</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    metrics <span class="op">:=</span> <span class="bu">make</span><span class="op">([]</span>telegraf<span class="op">.</span>Metric<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> bufferSize<span class="op">)</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">defer</span> <span class="kw">func</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> err <span class="op">=</span> s<span class="op">.</span>Output<span class="op">.</span>Write<span class="op">(</span>metrics<span class="op">);</span> err <span class="op">!=</span> <span class="ot">nil</span> <span class="op">{</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">.</span>Fprintf<span class="op">(</span>os<span class="op">.</span>Stderr<span class="op">,</span> <span class="st">"Failed to write metrics: %s</span><span class="ch">\n</span><span class="st">"</span><span class="op">,</span> err<span class="op">)</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">}()</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  loop<span class="op">:</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> <span class="op">{</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>      <span class="cf">select</span> <span class="op">{</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>      <span class="cf">case</span> m<span class="op">,</span> ok <span class="op">:=</span> <span class="op">&lt;-</span>ch<span class="op">:</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">!</span>ok <span class="op">{</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>          <span class="cf">break</span> loop</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        metrics <span class="op">=</span> <span class="bu">append</span><span class="op">(</span>metrics<span class="op">,</span> m<span class="op">)</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>      <span class="cf">case</span> <span class="op">&lt;-</span>t<span class="op">.</span>C<span class="op">:</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> err <span class="op">=</span> s<span class="op">.</span>Output<span class="op">.</span>Write<span class="op">(</span>metrics<span class="op">);</span> err <span class="op">!=</span> <span class="ot">nil</span> <span class="op">{</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>          fmt<span class="op">.</span>Fprintf<span class="op">(</span>os<span class="op">.</span>Stderr<span class="op">,</span> <span class="st">"Failed to write metrics: %s</span><span class="ch">\n</span><span class="st">"</span><span class="op">,</span> err<span class="op">)</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        metrics <span class="op">=</span> metrics<span class="op">[:</span><span class="dv">0</span><span class="op">]</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>      <span class="op">}</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="op">}()</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  scanner <span class="op">:=</span> bufio<span class="op">.</span>NewScanner<span class="op">(</span>os<span class="op">.</span>Stdin<span class="op">)</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> scanner<span class="op">.</span>Scan<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    m<span class="op">,</span> err <span class="op">:=</span> parser<span class="op">.</span>ParseLine<span class="op">(</span>scanner<span class="op">.</span>Text<span class="op">())</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> err <span class="op">!=</span> <span class="ot">nil</span> <span class="op">{</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>      fmt<span class="op">.</span>Fprintf<span class="op">(</span>os<span class="op">.</span>Stderr<span class="op">,</span> <span class="st">"Failed to parse metric: %s</span><span class="ch">\n</span><span class="st">"</span><span class="op">,</span> err<span class="op">)</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>      <span class="cf">continue</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    ch <span class="op">&lt;-</span> m</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>  <span class="bu">close</span><span class="op">(</span>ch<span class="op">)</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>  wg<span class="op">.</span>Wait<span class="op">()</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="ot">nil</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>The original intention of the authors behind the Telegraf project was
+to use it with their main product - InfluxDB, a time-series database
+where data is saved as a key-value set of fields and tags. One of the
+side-effects is the fact that it does not require an explicit schema,
+which is ideal for Telegraf, because metrics generated by input plugins
+are not bound to any schema either. That&rsquo;s not the case for any kind of
+SQL database, ClickHouse included. Creating the schema and keeping it up
+to date has to be part of the feature set.</p>
+<p>Fortunately, doing it correctly was not a difficult task. To make
+things simple, each type of metric will be stored in a separate table.
+Given the interface of the output plugin, a quick scan over the given
+slice of metrics was enough to gather enough information about fields
+and tags that had to be supported by the corresponding table as columns.
+In the meantime, we also had to look at each column&rsquo;s value. A simple
+mapping from native Go types to their ClickHouse counterparts was enough
+to get this going.</p>
+<p>Before constructing the insert query, we can use all that information
+to either create or alter the relevant table. The only thing I haven&rsquo;t
+decided to pursue was altering the existing columns - doing so could
+lead to a potential data loss and as such would be difficult to
+implement safely. To be honest, I&rsquo;m not sure it&rsquo;s even supported by the
+InfluxDB, let alone any other output plugin.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>s <span class="op">*</span>Clickhouse<span class="op">)</span> Write<span class="op">(</span>metrics <span class="op">[]</span>telegraf<span class="op">.</span>Metric<span class="op">)</span> <span class="dt">error</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  tableCols <span class="op">:=</span> <span class="bu">make</span><span class="op">(</span><span class="kw">map</span><span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="kw">map</span><span class="op">[</span><span class="dt">string</span><span class="op">]</span>Datatype<span class="op">)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  tableColValues <span class="op">:=</span> <span class="bu">make</span><span class="op">(</span><span class="kw">map</span><span class="op">[</span><span class="dt">string</span><span class="op">][]</span><span class="kw">map</span><span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="kw">interface</span><span class="op">{})</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> _<span class="op">,</span> metric <span class="op">:=</span> <span class="kw">range</span> metrics <span class="op">{</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    batch <span class="op">:=</span> <span class="bu">make</span><span class="op">(</span><span class="kw">map</span><span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="kw">interface</span><span class="op">{})</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> tableCols<span class="op">[</span>metric<span class="op">.</span>Name<span class="op">()]</span> <span class="op">==</span> <span class="ot">nil</span> <span class="op">{</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      tableCols<span class="op">[</span>metric<span class="op">.</span>Name<span class="op">()]</span> <span class="op">=</span> <span class="bu">make</span><span class="op">(</span><span class="kw">map</span><span class="op">[</span><span class="dt">string</span><span class="op">]</span>Datatype<span class="op">,</span> <span class="bu">len</span><span class="op">(</span>metric<span class="op">.</span>Tags<span class="op">())+</span><span class="bu">len</span><span class="op">(</span>metric<span class="op">.</span>FieldList<span class="op">())+</span><span class="dv">1</span><span class="op">)</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> s<span class="op">.</span>TimestampColumn <span class="op">!=</span> <span class="st">""</span> <span class="op">{</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>      tableCols<span class="op">[</span>metric<span class="op">.</span>Name<span class="op">()][</span>s<span class="op">.</span>TimestampColumn<span class="op">]</span> <span class="op">=</span> resolveDatatype<span class="op">(</span>metric<span class="op">.</span>Time<span class="op">())</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>      batch<span class="op">[</span>s<span class="op">.</span>TimestampColumn<span class="op">]</span> <span class="op">=</span> metric<span class="op">.</span>Time<span class="op">()</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> column<span class="op">,</span> value <span class="op">:=</span> <span class="kw">range</span> metric<span class="op">.</span>Tags<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>      tableCols<span class="op">[</span>metric<span class="op">.</span>Name<span class="op">()][</span>column<span class="op">]</span> <span class="op">=</span> resolveDatatype<span class="op">(</span>value<span class="op">)</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>      batch<span class="op">[</span>column<span class="op">]</span> <span class="op">=</span> value</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> column<span class="op">,</span> value <span class="op">:=</span> <span class="kw">range</span> metric<span class="op">.</span>Fields<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>      tableCols<span class="op">[</span>metric<span class="op">.</span>Name<span class="op">()][</span>column<span class="op">]</span> <span class="op">=</span> resolveDatatype<span class="op">(</span>value<span class="op">)</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>      batch<span class="op">[</span>column<span class="op">]</span> <span class="op">=</span> value</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    tableColValues<span class="op">[</span>metric<span class="op">.</span>Name<span class="op">()]</span> <span class="op">=</span> <span class="bu">append</span><span class="op">(</span>tableColValues<span class="op">[</span>metric<span class="op">.</span>Name<span class="op">()],</span> batch<span class="op">)</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  <span class="co">// omitted for brevity</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> resolveDatatype<span class="op">(</span>value <span class="kw">interface</span><span class="op">{})</span> Datatype <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">var</span> datatype Datatype</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">switch</span> value<span class="op">.(</span><span class="kw">type</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> <span class="dt">int64</span><span class="op">:</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        datatype <span class="op">=</span> Integer</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> <span class="dt">uint64</span><span class="op">:</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        datatype <span class="op">=</span> Unsigned</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> <span class="dt">float64</span><span class="op">:</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        datatype <span class="op">=</span> Real</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> <span class="dt">string</span><span class="op">:</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        datatype <span class="op">=</span> Text</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> <span class="dt">bool</span><span class="op">:</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        datatype <span class="op">=</span> Bool</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> time<span class="op">.</span>Time<span class="op">:</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        datatype <span class="op">=</span> Timestamp</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">default</span><span class="op">:</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        datatype <span class="op">=</span> Default</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> datatype</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>As for actually writing the metrics to the database, I used the <a href="https://clickhouse.com/docs/en/optimize/asynchronous-inserts">Asynchronous
+Inserts</a> functionality. In short, it enables ClickHouse to
+memory-buffer the inserted values before writing them to disk. It takes
+care of the issue created when it has to handle a lot of small and
+frequent inserts. To increase the performance of the whole solution,
+I&rsquo;ve made sure each batch of metrics converts into a single insert query
+per table. That way, even if I decide the async writes should no longer
+be enabled, the plugin will still execute - at most - a single insertion
+per table per second.</p>
+<h3 id="lets-sum-it-up">Let&rsquo;s sum it up!</h3>
+<p>It took me around two days to implement and deploy this solution to
+production. I&rsquo;ve lowered the memory footprint on the Telegraf side, and
+solved the excessive disk writes issue on the ClickHouse side. I&rsquo;ve also
+learned a bunch about Telegraf. My main takeaway from this little
+project is this - don&rsquo;t be afraid of writing integrations yourself,
+because it might actually be worth it.</p>
 
     </div>
 </section>

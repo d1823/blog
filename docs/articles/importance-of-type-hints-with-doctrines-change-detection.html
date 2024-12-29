@@ -829,6 +829,13 @@ footer > div {
   border: 3px solid var(--color-highlight);
 }
 
+blockquote {
+  border-left: 5px var(--color-highlight) solid;
+  margin-left: 0;
+  padding-left: 1.1rem;
+  font-style: italic;
+}
+
 @media screen and (min-width: 1280px) {
   html, body {
     font-size: 16px;
@@ -1048,79 +1055,103 @@ code span.wa {
 
     <div class="page__content">
         
-<p>Doctrine tends to be a pretty forgiving ORM. Despite it&#x2019;s rigid structure and reliance on complex class hierarchies, it has a bunch of cases that it happily lets slide. For some, it will emit a warning (ex. incorrectly defined relationships). Others will be silently accepted without too much of a hassle, aside from a note in the documentation (ex. <a href="https://www.doctrine-project.org/projects/doctrine-orm/en/3.1/reference/events.html#events-overview">nested flushes through event listeners</a>). Recently, I discovered an edge case that doesn&#x2019;t generate any warnings, and - as far as I know - is not mentioned by the documentation. When the type specified by a column definition doesn&#x2019;t match the type of the underlying property, Doctrine happily detects non existing changes. Why does it even matter? Read to the end.</p>
+<p>Doctrine tends to be a pretty forgiving ORM. Despite it&rsquo;s rigid
+structure and reliance on complex class hierarchies, it has a bunch of
+cases that it happily lets slide. For some, it will emit a warning (ex.
+incorrectly defined relationships). Others will be silently accepted
+without too much of a hassle, aside from a note in the documentation
+(ex. <a href="https://www.doctrine-project.org/projects/doctrine-orm/en/3.1/reference/events.html#events-overview">nested
+flushes through event listeners</a>). Recently, I discovered an edge
+case that doesn&rsquo;t generate any warnings, and - as far as I know - is not
+mentioned by the documentation. When the type specified by a column
+definition doesn&rsquo;t match the type of the underlying property, Doctrine
+happily detects non existing changes. Why does it even matter? Read to
+the end.</p>
 <h3 id="an-example">An example</h3>
-<p>Here&#x2019;s a bare-bones Doctrine entity.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">&lt;?php</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co">#[ORM\Entity]</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">class</span> Book</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>{</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>    <span class="co">#[Id]</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>    <span class="co">#[GeneratedValue]</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>    <span class="co">#[ORM\Column]</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    <span class="kw">public</span> <span class="kw">int</span> <span class="kw">$id</span><span class="ot">;</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    <span class="co">#[ORM\Column(type: 'decimal')]</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>    <span class="kw">public</span> <span class="kw">float</span> <span class="kw">$price</span><span class="ot">;</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>}</span></code></pre></div>
-<p>There&#x2019;s nothing special about it aside from the types visible on the <em>price</em> property. The column is defined as a <strong>decimal</strong>, while the property&#x2019;s type-hint is <strong>float</strong>. Let&#x2019;s boot Doctrine and see what it has to say about it.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>$ <span class="ex">bin/console</span> doctrine:mapping:info</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a> <span class="ex">Found</span> 1 mapped entities:</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a> [<span class="ex">OK</span>]   App\Entity\Book</span></code></pre></div>
-<p>Well&#x2026; not much. Let&#x2019;s also try the schema validation.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>$ <span class="ex">bin/console</span> doctrine:schema:validate</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="ex">Mapping</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="ex">-------</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a> [<span class="ex">FAIL</span>] The entity-class App\Entity\Book mapping is invalid:</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a> <span class="ex">*</span> The field <span class="st">'App\Entity\Book#price'</span> has the property type <span class="st">'float'</span> that differs from the metadata field type <span class="st">'string'</span> returned by the <span class="st">'decimal'</span> DBAL type.</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="ex">Database</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="ex">--------</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a> [<span class="ex">OK</span>] The database schema is in sync with the mapping files.</span></code></pre></div>
-<p>This one successfully reports an issue. It&#x2019;s important to note that it will do that only if you&#x2019;re keeping your dependencies relatively up to date. The schema validation <a href="https://github.com/doctrine/orm/pull/10946">has been extended to look for this violation</a> pretty recently (at least, relative to this very moment). Thanks to <a href="https://github.com/greg0ire">greg0ire</a> for pointing that out!</p>
-<p>But, what if your dependencies are out of date and Doctrine reports nothing, or what if you don&#x2019;t use the schema validation tool at all. What&#x2019;s the big deal? Let&#x2019;s try it out.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">&lt;?php</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="kw">class</span> DatabaseTest <span class="kw">extends</span> KernelTestCase</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>{</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    <span class="kw">public</span> <span class="kw">function</span> testDoctrine<span class="ot">()</span>: <span class="kw">void</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>    {</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>        <span class="kw">$em</span> = <span class="kw">$this</span>-&gt;getContainer<span class="ot">()</span>-&gt;get<span class="ot">(</span>EntityManagerInterface::<span class="kw">class</span><span class="ot">);</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>        <span class="kw">$book</span> = <span class="kw">new</span> Book<span class="ot">();</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>        <span class="kw">$book</span>-&gt;price = <span class="fl">5.0</span><span class="ot">;</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>        <span class="kw">$em</span>-&gt;persist<span class="ot">(</span><span class="kw">$book</span><span class="ot">);</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>        <span class="kw">$em</span>-&gt;<span class="fu">flush</span><span class="ot">();</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a>        <span class="kw">$this</span>-&gt;assertIsInt<span class="ot">(</span><span class="kw">$book</span>-&gt;id<span class="ot">);</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>    }</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Here&rsquo;s a bare-bones Doctrine entity.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;?php</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">#[</span><span class="cn">ORM</span>\Entity<span class="at">]</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Book</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">#[</span>Id<span class="at">]</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">#[</span>GeneratedValue<span class="at">]</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">#[</span><span class="cn">ORM</span>\Column<span class="at">]</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">int</span> <span class="va">$id</span><span class="ot">;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">#[</span><span class="cn">ORM</span>\Column(type<span class="ot">:</span> <span class="st">'decimal'</span>)<span class="at">]</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="dt">float</span> <span class="va">$price</span><span class="ot">;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>There&rsquo;s nothing special about it aside from the types visible on the
+<em>price</em> property. The column is defined as a
+<strong>decimal</strong>, while the property&rsquo;s type-hint is
+<strong>float</strong>. Let&rsquo;s boot Doctrine and see what it has to say
+about it.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> bin/console doctrine:mapping:info</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a> <span class="ex">Found</span> 1 mapped entities:</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a> <span class="ex">[OK]</span>   App<span class="dt">\E</span>ntity<span class="dt">\B</span>ook</span></code></pre></div>
+<p>Well&hellip; not much. Let&rsquo;s also try the schema validation.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> bin/console doctrine:schema:validate</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Mapping</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="ex">-------</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a> <span class="ex">[FAIL]</span> The entity-class App<span class="dt">\E</span>ntity<span class="dt">\B</span>ook mapping is invalid:</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a> <span class="ex">*</span> The field <span class="st">'App\Entity\Book#price'</span> has the property type <span class="st">'float'</span> that differs from the metadata field type <span class="st">'string'</span> returned by the <span class="st">'decimal'</span> DBAL type.</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="ex">Database</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="ex">--------</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a> <span class="ex">[OK]</span> The database schema is in sync with the mapping files.</span></code></pre></div>
+<p>This one successfully reports an issue. It&rsquo;s important to note that
+it will do that only if you&rsquo;re keeping your dependencies relatively up
+to date. The schema validation <a href="https://github.com/doctrine/orm/pull/10946">has been extended to
+look for this violation</a> pretty recently (at least, relative to this
+very moment). Thanks to <a href="https://github.com/greg0ire">greg0ire</a> for pointing that
+out!</p>
+<p>But, what if your dependencies are out of date and Doctrine reports
+nothing, or what if you don&rsquo;t use the schema validation tool at all.
+What&rsquo;s the big deal? Let&rsquo;s try it out.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;?php</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DatabaseTest <span class="kw">extends</span> KernelTestCase</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="kw">function</span> testDoctrine()<span class="ot">:</span> <span class="dt">void</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">$em</span> <span class="op">=</span> <span class="va">$this</span>-&gt;getContainer()-&gt;get(EntityManagerInterface::<span class="kw">class</span>)<span class="ot">;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">$book</span> <span class="op">=</span> <span class="kw">new</span> Book()<span class="ot">;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">$book</span>-&gt;price <span class="op">=</span> <span class="fl">5.0</span><span class="ot">;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">$em</span>-&gt;persist(<span class="va">$book</span>)<span class="ot">;</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">$em</span>-&gt;<span class="fu">flush</span>()<span class="ot">;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">$this</span>-&gt;assertIsInt(<span class="va">$book</span>-&gt;id)<span class="ot">;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>It ends up working.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="ex">Time</span>: 00:00.128, Memory: 18.00 MB</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="ex">OK</span> (1 test, 1 assertion)</span></code></pre></div>
-<p>Huh. Nothing out of ordinary. Let&#x2019;s try with a fresh Entity Manager, and fetch the persisted entity. Let&#x2019;s also emit an immediate flush&#x2026;</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">&lt;?php</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="kw">class</span> DatabaseTest <span class="kw">extends</span> KernelTestCase</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>{</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>    <span class="kw">public</span> <span class="kw">function</span> testDoctrine<span class="ot">()</span>: <span class="kw">void</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>    {</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>        <span class="st">...</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>        <span class="kw">$em</span>-&gt;clear<span class="ot">();</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>        <span class="kw">$em</span>-&gt;find<span class="ot">(</span>Book::<span class="kw">class</span><span class="ot">,</span> <span class="kw">$book</span>-&gt;id<span class="ot">);</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>        <span class="kw">$em</span>-&gt;<span class="fu">flush</span><span class="ot">();</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>    }</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>}</span></code></pre></div>
-<p>&#x2026;and inspect the statements Doctrine has issued in the background.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Time:</span> 00:00.128, Memory: 18.00 MB</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">OK</span> <span class="er">(</span><span class="ex">1</span> test, 1 assertion<span class="kw">)</span></span></code></pre></div>
+<p>Huh. Nothing out of ordinary. Let&rsquo;s try with a fresh Entity Manager,
+and fetch the persisted entity. Let&rsquo;s also emit an immediate flush&hellip;</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;?php</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DatabaseTest <span class="kw">extends</span> KernelTestCase</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="kw">function</span> testDoctrine()<span class="ot">:</span> <span class="dt">void</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        ...</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">$em</span>-&gt;clear()<span class="ot">;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">$em</span>-&gt;find(Book::<span class="kw">class</span><span class="ot">,</span> <span class="va">$book</span>-&gt;id)<span class="ot">;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">$em</span>-&gt;<span class="fu">flush</span>()<span class="ot">;</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>&hellip;and inspect the statements Doctrine has issued in the
+background.</p>
 <pre class="log"><code>Beginning transaction [] []
 Executing statement: INSERT INTO book (price) VALUES (?) (parameters: array{"1":5.0}, types: array{"1":2}) {"sql":"INSERT INTO book (price) VALUES (?)","params":{"1":5.0},"types":{"1":2}} []
 Committing transaction [] []
@@ -1128,51 +1159,87 @@ Executing statement: SELECT t0.id AS id_1, t0.price AS price_2 FROM book t0 WHER
 Beginning transaction [] []
 Executing statement: UPDATE book SET price = ? WHERE id = ? (parameters: array{"1":5.0,"2":8}, types: array{"1":2,"2":1}) {"sql":"UPDATE book SET price = ? WHERE id = ?","params":{"1":5.0,"2":8},"types":{"1":2,"2":1}} []
 Committing transaction [] []</code></pre>
-<p>We&#x2019;ve got the INSERT statement corresponding to the initial flush with the new <strong>Book</strong> entity, there&#x2019;s also the SELECT query we&#x2019;ve executed when we called <code>EntityManager::find</code>, then there&#x2019;s&#x2026; an UPDATE statement despite the fact that we did not make any updates to the price. What gives?</p>
-<h3 id="unit-of-work-change-detection">Unit of Work &amp; change detection</h3>
-<p>When you&#x2019;re using Doctrine&#x2019;s ORM, everything you do is going through the Entity Manager. Each inserted, updated or fetched entity is recorded in an identity map so that the Unit of Work can keep track of them throughout their life cycle. At this point it&#x2019;s considered a common knowledge and is definitely better explained in Doctrine&#x2019;s documentation. The only reason why I&#x2019;m mentioning it is because it&#x2019;s also the reason why the logs above show an implicit UPDATE statement. The Unit of Work considers the book entity to be dirty. Why exactly?</p>
-<p>When you execute a flush, the entity manager utilizes its internal Unit of Work to translate the state of entities into a set of different statements. To do that, the Unit of Work needs to iterate over its identity map and compare the current state of entities with their original state snapshotted right after they were fetched from the database. The snippet below represents the logic driving the process of establishing whether a particular value has been changed, and you can clearly see that it uses an <strong>identity comparison</strong>.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">&lt;?php</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="kw">class</span> UnitOfWork</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>{</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>    <span class="st">...</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>    <span class="kw">public</span> <span class="kw">function</span> computeChangeSet<span class="ot">(</span>ClassMetadata <span class="kw">$class</span><span class="ot">,</span> <span class="kw">object</span> <span class="kw">$entity</span><span class="ot">)</span>: <span class="kw">void</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>    {</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>        <span class="st">...</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a>        <span class="co">// Entity is "fully" MANAGED: it was already fully persisted before</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true"></a>        <span class="co">// and we have a copy of the original data</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true"></a>        <span class="kw">$originalData</span> = <span class="kw">$this</span>-&gt;originalEntityData<span class="ot">[</span><span class="kw">$oid</span><span class="ot">];</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true"></a>        <span class="kw">$changeSet</span>    = <span class="ot">[];</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true"></a></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true"></a>        <span class="kw">foreach</span> <span class="ot">(</span><span class="kw">$actualData</span> <span class="kw">as</span> <span class="kw">$propName</span> =&gt; <span class="kw">$actualValue</span><span class="ot">)</span> {</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true"></a>            <span class="st">...</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true"></a></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true"></a>            <span class="kw">$orgValue</span> = <span class="kw">$originalData</span><span class="ot">[</span><span class="kw">$propName</span><span class="ot">];</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true"></a></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true"></a>            <span class="st">...</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true"></a></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true"></a>            <span class="co">// skip if value haven't changed</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true"></a>            <span class="kw">if</span> <span class="ot">(</span><span class="kw">$orgValue</span> === <span class="kw">$actualValue</span><span class="ot">)</span> {</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true"></a>                <span class="kw">continue</span><span class="ot">;</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true"></a>            }</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true"></a></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true"></a>        <span class="st">...</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true"></a>    }</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Because the identity comparison is described as &#x201C;true if $a is equal to $b, and they are of the same type&#x201D;, the provided entity example represents an entity with an invalid mapping. The mapping is invalid because the Unit of Work cannot properly determine whether a given property has really changed.</p>
+<p>We&rsquo;ve got the INSERT statement corresponding to the initial flush
+with the new <strong>Book</strong> entity, there&rsquo;s also the SELECT query
+we&rsquo;ve executed when we called <code>EntityManager::find</code>, then
+there&rsquo;s&hellip; an UPDATE statement despite the fact that we did not make any
+updates to the price. What gives?</p>
+<h3 id="unit-of-work-change-detection">Unit of Work &amp; change
+detection</h3>
+<p>When you&rsquo;re using Doctrine&rsquo;s ORM, everything you do is going through
+the Entity Manager. Each inserted, updated or fetched entity is recorded
+in an identity map so that the Unit of Work can keep track of them
+throughout their life cycle. At this point it&rsquo;s considered a common
+knowledge and is definitely better explained in Doctrine&rsquo;s
+documentation. The only reason why I&rsquo;m mentioning it is because it&rsquo;s
+also the reason why the logs above show an implicit UPDATE statement.
+The Unit of Work considers the book entity to be dirty. Why exactly?</p>
+<p>When you execute a flush, the entity manager utilizes its internal
+Unit of Work to translate the state of entities into a set of different
+statements. To do that, the Unit of Work needs to iterate over its
+identity map and compare the current state of entities with their
+original state snapshotted right after they were fetched from the
+database. The snippet below represents the logic driving the process of
+establishing whether a particular value has been changed, and you can
+clearly see that it uses an <strong>identity comparison</strong>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode php"><code class="sourceCode php"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">&lt;?php</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> UnitOfWork</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>{</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">public</span> <span class="kw">function</span> computeChangeSet(ClassMetadata <span class="va">$class</span><span class="ot">,</span> <span class="dt">object</span> <span class="va">$entity</span>)<span class="ot">:</span> <span class="dt">void</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        ...</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        <span class="co">// Entity is "fully" MANAGED: it was already fully persisted before</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        <span class="co">// and we have a copy of the original data</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">$originalData</span> <span class="op">=</span> <span class="va">$this</span>-&gt;originalEntityData[<span class="va">$oid</span>]<span class="ot">;</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        <span class="va">$changeSet</span>    <span class="op">=</span> []<span class="ot">;</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">foreach</span> (<span class="va">$actualData</span> <span class="kw">as</span> <span class="va">$propName</span> =&gt; <span class="va">$actualValue</span>) {</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>            ...</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>            <span class="va">$orgValue</span> <span class="op">=</span> <span class="va">$originalData</span>[<span class="va">$propName</span>]<span class="ot">;</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>            ...</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>            <span class="co">// skip if value haven't changed</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="va">$orgValue</span> <span class="op">===</span> <span class="va">$actualValue</span>) {</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span><span class="ot">;</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>        ...</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Because the identity comparison is described as &ldquo;true if $a is equal
+to $b, and they are of the same type&rdquo;, the provided entity example
+represents an entity with an invalid mapping. The mapping is invalid
+because the Unit of Work cannot properly determine whether a given
+property has really changed.</p>
 <h3 id="the-impact-conclusions">The impact &amp; conclusions</h3>
-<p>Older codebases are full of entities like the example above. It certainly was the case for one of the projects I&#x2019;m working on. At the first glance, one additional almost-noop UPDATE statement might not seem like a big of a deal, but with enough entities like that and enough traffic, it might became a real problem. Unrelated operations might become sources of updates to specific tables, increasing the number of update locks with possibilities for deadlocks, as well as the amount of resources needed for the database to serve under an application, increasing the operating costs.</p>
+<p>Older codebases are full of entities like the example above. It
+certainly was the case for one of the projects I&rsquo;m working on. At the
+first glance, one additional almost-noop UPDATE statement might not seem
+like a big of a deal, but with enough entities like that and enough
+traffic, it might became a real problem. Unrelated operations might
+become sources of updates to specific tables, increasing the number of
+update locks with possibilities for deadlocks, as well as the amount of
+resources needed for the database to serve under an application,
+increasing the operating costs.</p>
 <p>How to avoid it? Doctrine offers us a few options:</p>
 <ul>
 <li>we can keep both the column &amp; property types in sync</li>
-<li>we can drop the column type and let it be auto inferred based on the property type</li>
-<li>we can drop the property type and let it be auto inferred based on the column type</li>
+<li>we can drop the column type and let it be auto inferred based on the
+property type</li>
+<li>we can drop the property type and let it be auto inferred based on
+the column type</li>
 </ul>
-<p>Obviously, each one has its set of pros and cons which means the answer is &#x201C;It depends&#x201D;.</p>
-<p>PS: Oh, and please don&#x2019;t use floats to store decimals. Refactoring an established codebase away from that architectural decision is a really difficult task.</p>
+<p>Obviously, each one has its set of pros and cons which means the
+answer is &ldquo;It depends&rdquo;.</p>
+<p>PS: Oh, and please don&rsquo;t use floats to store decimals. Refactoring an
+established codebase away from that architectural decision is a really
+difficult task.</p>
 
     </div>
 </section>

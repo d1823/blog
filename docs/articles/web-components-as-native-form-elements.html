@@ -829,6 +829,13 @@ footer > div {
   border: 3px solid var(--color-highlight);
 }
 
+blockquote {
+  border-left: 5px var(--color-highlight) solid;
+  margin-left: 0;
+  padding-left: 1.1rem;
+  font-style: italic;
+}
+
 @media screen and (min-width: 1280px) {
   html, body {
     font-size: 16px;
@@ -1048,10 +1055,36 @@ code span.wa {
 
     <div class="page__content">
         
-<p>When I&#x2019;m working on my personal projects, I like to stay as low level as possible. In most cases, I&#x2019;d be happy to even skip JavaScript altogether and just rely on the limited browser features. Obviously, with today&#x2019;s expectations related to applications interactivity, it&#x2019;s not always possible. Even personal projects should still feel modern enough.</p>
-<p>Recently, I tasked myself with implementing a frontend for one of the applications of mine with pure web components. No dependencies, aside from necessary polyfills. At some point I started working on one form that required a few custom controls to make it easier to use. I was doing some very basic form handling on the web-component level and decided to explore the idea of using custom controls as if they were native - that is, no custom data handling and the only thing you ever have to do to grab the form state is <code>new FormData(e.target)</code> in the submit handler. Years ago, when I last tried something like that, it was impossible and the developer had no other option than to serialize the control&#x2019;s value to a native control to make sure the form can pick it up. How does it look right now?</p>
-<p>Meet <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/attachInternals#examples">form associated web components</a> with <a href="https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals">ElementInternals</a>. This nifty conjunction allows us to tie any web component into the parent form. As a result, we can create custom controls that don&#x2019;t require any custom data handling. Whatever you do internally is your thing. As long as you call <a href="https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setFormValue">setFormValue</a>, you can be sure it&#x2019;s going to be picked up during form submission. Obviously, you need to make sure the set value is serialized into something that can be serialized into a form value. <a href="https://caniuse.com/?search=ElementInternals">The browser support is there as well</a>.</p>
-<p>Check out the additional examples on MDN. It&#x2019;s an insanely good feature.</p>
+<p>When I&rsquo;m working on my personal projects, I like to stay as low level
+as possible. In most cases, I&rsquo;d be happy to even skip JavaScript
+altogether and just rely on the limited browser features. Obviously,
+with today&rsquo;s expectations related to applications interactivity, it&rsquo;s
+not always possible. Even personal projects should still feel modern
+enough.</p>
+<p>Recently, I tasked myself with implementing a frontend for one of the
+applications of mine with pure web components. No dependencies, aside
+from necessary polyfills. At some point I started working on one form
+that required a few custom controls to make it easier to use. I was
+doing some very basic form handling on the web-component level and
+decided to explore the idea of using custom controls as if they were
+native - that is, no custom data handling and the only thing you ever
+have to do to grab the form state is <code>new FormData(e.target)</code>
+in the submit handler. Years ago, when I last tried something like that,
+it was impossible and the developer had no other option than to
+serialize the control&rsquo;s value to a native control to make sure the form
+can pick it up. How does it look right now?</p>
+<p>Meet <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/attachInternals#examples">form
+associated web components</a> with <a href="https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals">ElementInternals</a>.
+This nifty conjunction allows us to tie any web component into the
+parent form. As a result, we can create custom controls that don&rsquo;t
+require any custom data handling. Whatever you do internally is your
+thing. As long as you call <a href="https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setFormValue">setFormValue</a>,
+you can be sure it&rsquo;s going to be picked up during form submission.
+Obviously, you need to make sure the set value is serialized into
+something that can be serialized into a form value. <a href="https://caniuse.com/?search=ElementInternals">The browser support
+is there as well</a>.</p>
+<p>Check out the additional examples on MDN. It&rsquo;s an insanely good
+feature.</p>
 
     </div>
 </section>

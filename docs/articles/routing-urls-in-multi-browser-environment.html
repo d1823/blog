@@ -829,6 +829,13 @@ footer > div {
   border: 3px solid var(--color-highlight);
 }
 
+blockquote {
+  border-left: 5px var(--color-highlight) solid;
+  margin-left: 0;
+  padding-left: 1.1rem;
+  font-style: italic;
+}
+
 @media screen and (min-width: 1280px) {
   html, body {
     font-size: 16px;
@@ -1048,10 +1055,38 @@ code span.wa {
 
     <div class="page__content">
         
-<p>I&#x2019;m using multiple browsers: Firefox for regular web browsing, and Chrome for work. Additionally, I&#x2019;m utilizing multiple Chrome profiles, one for every client I work with, to have a dedicated browser space with separate extensions and sessions. This setup works&#x2026; as long as I&#x2019;m within a web browser. When I&#x2019;m in a terminal, or in Slack, or any other non-browser context, all these assumptions about particular browser or profiles being used for specific sites no longer apply. The operating system doesn&#x2019;t know about them, and the only way to control what browser is going to handle the URL I just clicked, is to set the default browser in the system settings. That&#x2019;s not enough.</p>
-<p>Initially, I went ahead and made sure each application that allowed it was set with its dedicated web browser. Unfortunately, after a while I figured it&#x2019;s not enough. There were applications that either didn&#x2019;t support overriding the default web browser, or I&#x2019;ve already used them in multiple contexts which made overriding a default web browser useless. I knew the process of determining the correct browser to handle the URL has to apply some basic logic and it&#x2019;s not doable with the system or application settings. That&#x2019;s how I got the idea of a middleman.</p>
-<p>When you click a URL, every modern OS will parse it and look up the configured handler based on the schema. For HTTP &amp; HTTPS URLs, it&#x2019;s going to look for the default web browser. I decided to use this setup to my advantage, and replace the default web browser with a small utility that&#x2019;s only responsibility is to launch the correct browser with the URL it got as an input. The logic behind it was based on the URL being matched against a list of regexp patterns - the first match determined the correct browser. I&#x2019;ve put the configuration in a JSON file, tweaked it a few times over the next weeks and forgot about it completely afterwards. It&#x2019;s been working flawlessly ever since.</p>
-<p>If you&#x2019;re interested, check out the <a href="https://github.com/d1823/browser-matcher">browser-matcher repository on GitHub</a>. It&#x2019;s just a small Go application that you might find useful if you&#x2019;re using multiple browser, or browser profiles like I do.</p>
+<p>I&rsquo;m using multiple browsers: Firefox for regular web browsing, and
+Chrome for work. Additionally, I&rsquo;m utilizing multiple Chrome profiles,
+one for every client I work with, to have a dedicated browser space with
+separate extensions and sessions. This setup works&hellip; as long as I&rsquo;m
+within a web browser. When I&rsquo;m in a terminal, or in Slack, or any other
+non-browser context, all these assumptions about particular browser or
+profiles being used for specific sites no longer apply. The operating
+system doesn&rsquo;t know about them, and the only way to control what browser
+is going to handle the URL I just clicked, is to set the default browser
+in the system settings. That&rsquo;s not enough.</p>
+<p>Initially, I went ahead and made sure each application that allowed
+it was set with its dedicated web browser. Unfortunately, after a while
+I figured it&rsquo;s not enough. There were applications that either didn&rsquo;t
+support overriding the default web browser, or I&rsquo;ve already used them in
+multiple contexts which made overriding a default web browser useless. I
+knew the process of determining the correct browser to handle the URL
+has to apply some basic logic and it&rsquo;s not doable with the system or
+application settings. That&rsquo;s how I got the idea of a middleman.</p>
+<p>When you click a URL, every modern OS will parse it and look up the
+configured handler based on the schema. For HTTP &amp; HTTPS URLs, it&rsquo;s
+going to look for the default web browser. I decided to use this setup
+to my advantage, and replace the default web browser with a small
+utility that&rsquo;s only responsibility is to launch the correct browser with
+the URL it got as an input. The logic behind it was based on the URL
+being matched against a list of regexp patterns - the first match
+determined the correct browser. I&rsquo;ve put the configuration in a JSON
+file, tweaked it a few times over the next weeks and forgot about it
+completely afterwards. It&rsquo;s been working flawlessly ever since.</p>
+<p>If you&rsquo;re interested, check out the <a href="https://github.com/d1823/browser-matcher">browser-matcher
+repository on GitHub</a>. It&rsquo;s just a small Go application that you
+might find useful if you&rsquo;re using multiple browser, or browser profiles
+like I do.</p>
 
     </div>
 </section>

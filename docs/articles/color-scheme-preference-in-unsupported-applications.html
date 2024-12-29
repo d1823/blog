@@ -829,6 +829,13 @@ footer > div {
   border: 3px solid var(--color-highlight);
 }
 
+blockquote {
+  border-left: 5px var(--color-highlight) solid;
+  margin-left: 0;
+  padding-left: 1.1rem;
+  font-style: italic;
+}
+
 @media screen and (min-width: 1280px) {
   html, body {
     font-size: 16px;
@@ -1048,28 +1055,76 @@ code span.wa {
 
     <div class="page__content">
         
-<p>I live in a pretty small apartment. It&#x2019;s especially visible in the room me and my fiancee are using as our office. Our desks are placed in such a way that makes it possible to reach them and walk around the room without bumping into each other but that&#x2019;s pretty much the only good thing about it. The room is constantly either too bright or too dark, which requires me to fiddle with my display&#x2019;s brightness so it&#x2019;s not burning out my retinas, or getting me a headache from squeezing my eyes for an extended period of time. Nowadays I&#x2019;m doing it using <a href="/articles/changing-your-displays-brightness-using-the-system-launcher">my small ddcutil-based utility</a> I wrote in bash a while ago.</p>
-<p>I&#x2019;m also a heavy user of the <a href="https://github.com/flatpak/xdg-desktop-portal/blob/d7a304a00697d7d608821253cd013f3b97ac0fb6/data/org.freedesktop.impl.portal.Settings.xml#L33-L45">Freedesktop&#x2019;s color scheme preference</a> supported natively in Gnome. Whenever I feel the display is set alright, but Gnome&#x2019;s theme is still making me uncomfortable, I&#x2019;m toggling the appearance to either dark or light, depending on my needs. It mostly does the job. The whole DE switches its color scheme, including Firefox &amp; Chrome and any website that supports the <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme">prefers-color-scheme</a> media feature. Sadly, not all applications are supported - Slack on Linux is by far the biggest offender here, because there&#x2019;s no way to change its theme from the outside. But, the list also includes applications like Alacritty, (neo)vim, emacs, or&#x2026; tmux. None of them support the Freedesktop&#x2019;s color scheme preference natively.</p>
-<p>After a while, the process of manually switching themes got really tedious, which lead me to implementing <a href="https://github.com/d1823/themer">Themer</a>. It&#x2019;s a daemon, running as a Systemd user service, listening for the changes of the theme preference, and executing the configured adapters to trigger color scheme changes in applications that don&#x2019;t support it natively. At the time of writing this, it supports switching symlinks, talking to tmux, Alacritty and Konsole.</p>
-<h3 id="color-scheme-preference-tmux">Color scheme preference &amp; tmux</h3>
-<p>The first step is to put the light and dark themes into separate files. I&#x2019;ve chosen to follow the XDG spec, and placed them in <code>~/.config/tmux/themes</code> directory, as <code>dark-theme.conf</code> and <code>light-theme.conf</code>.</p>
-<p>Next, I&#x2019;ve made sure to symlink one of them to the <code>~/.config/tmux/themes/current-theme.conf</code>, and let tmux know it needs to source it by adding <code>source-file ~/.config/tmux/themes/current-theme.conf</code> to my <code>~/.config/tmux/tmux.conf</code>. At that point, reloading my tmux config loaded the chosen theme.</p>
-<p>To make tmux switch its theme automatically once the color scheme preference changes, you need to set up <a href="https://github.com/d1823/themer">Themer</a>. Reference its README file to find out how to do that. If you&#x2019;re already past that, we need to append the relevant configuration to the <code>~/.config/themer/config.json</code>. In my case, the configuration looks as follows:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="fu">{</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>    <span class="dt">"no_preference_fallback"</span><span class="fu">:</span> <span class="st">"dark"</span><span class="fu">,</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    <span class="dt">"adapters"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>        <span class="fu">{</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>            <span class="dt">"adapter"</span><span class="fu">:</span> <span class="st">"tmux"</span><span class="fu">,</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>            <span class="dt">"dark_preference_file"</span><span class="fu">:</span> <span class="st">"/home/dawid/.config/tmux/themes/dark-theme.conf"</span><span class="fu">,</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>            <span class="dt">"light_preference_file"</span><span class="fu">:</span> <span class="st">"/home/dawid/.config/tmux/themes/light-theme.conf"</span><span class="fu">,</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>            <span class="dt">"target_file"</span><span class="fu">:</span> <span class="st">"/home/dawid/.config/tmux/themes/current-theme.conf"</span><span class="fu">,</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>            <span class="dt">"tmux_config_file"</span><span class="fu">:</span> <span class="st">"/home/dawid/.config/tmux/tmux.conf"</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>        <span class="fu">}</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>    <span class="ot">]</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="fu">}</span></span></code></pre></div>
-<p>Once that&#x2019;s done, restart the deaemon and switch your color scheme - it should trigger tmux to switch as well.</p>
+<p>I live in a pretty small apartment. It&rsquo;s especially visible in the
+room me and my fiancee are using as our office. Our desks are placed in
+such a way that makes it possible to reach them and walk around the room
+without bumping into each other but that&rsquo;s pretty much the only good
+thing about it. The room is constantly either too bright or too dark,
+which requires me to fiddle with my display&rsquo;s brightness so it&rsquo;s not
+burning out my retinas, or getting me a headache from squeezing my eyes
+for an extended period of time. Nowadays I&rsquo;m doing it using <a href="/articles/changing-your-displays-brightness-using-the-system-launcher">my
+small ddcutil-based utility</a> I wrote in bash a while ago.</p>
+<p>I&rsquo;m also a heavy user of the <a href="https://github.com/flatpak/xdg-desktop-portal/blob/d7a304a00697d7d608821253cd013f3b97ac0fb6/data/org.freedesktop.impl.portal.Settings.xml#L33-L45">Freedesktop&rsquo;s
+color scheme preference</a> supported natively in Gnome. Whenever I feel
+the display is set alright, but Gnome&rsquo;s theme is still making me
+uncomfortable, I&rsquo;m toggling the appearance to either dark or light,
+depending on my needs. It mostly does the job. The whole DE switches its
+color scheme, including Firefox &amp; Chrome and any website that
+supports the <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme">prefers-color-scheme</a>
+media feature. Sadly, not all applications are supported - Slack on
+Linux is by far the biggest offender here, because there&rsquo;s no way to
+change its theme from the outside. But, the list also includes
+applications like Alacritty, (neo)vim, emacs, or&hellip; tmux. None of them
+support the Freedesktop&rsquo;s color scheme preference natively.</p>
+<p>After a while, the process of manually switching themes got really
+tedious, which lead me to implementing <a href="https://github.com/d1823/themer">Themer</a>. It&rsquo;s a daemon,
+running as a Systemd user service, listening for the changes of the
+theme preference, and executing the configured adapters to trigger color
+scheme changes in applications that don&rsquo;t support it natively. At the
+time of writing this, it supports switching symlinks, talking to tmux,
+Alacritty and Konsole.</p>
+<h3 id="color-scheme-preference-tmux">Color scheme preference &amp;
+tmux</h3>
+<p>The first step is to put the light and dark themes into separate
+files. I&rsquo;ve chosen to follow the XDG spec, and placed them in
+<code>~/.config/tmux/themes</code> directory, as
+<code>dark-theme.conf</code> and <code>light-theme.conf</code>.</p>
+<p>Next, I&rsquo;ve made sure to symlink one of them to the
+<code>~/.config/tmux/themes/current-theme.conf</code>, and let tmux know
+it needs to source it by adding
+<code>source-file ~/.config/tmux/themes/current-theme.conf</code> to my
+<code>~/.config/tmux/tmux.conf</code>. At that point, reloading my tmux
+config loaded the chosen theme.</p>
+<p>To make tmux switch its theme automatically once the color scheme
+preference changes, you need to set up <a href="https://github.com/d1823/themer">Themer</a>. Reference its README
+file to find out how to do that. If you&rsquo;re already past that, we need to
+append the relevant configuration to the
+<code>~/.config/themer/config.json</code>. In my case, the configuration
+looks as follows:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"no_preference_fallback"</span><span class="fu">:</span> <span class="st">"dark"</span><span class="fu">,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"adapters"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"adapter"</span><span class="fu">:</span> <span class="st">"tmux"</span><span class="fu">,</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"dark_preference_file"</span><span class="fu">:</span> <span class="st">"/home/dawid/.config/tmux/themes/dark-theme.conf"</span><span class="fu">,</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"light_preference_file"</span><span class="fu">:</span> <span class="st">"/home/dawid/.config/tmux/themes/light-theme.conf"</span><span class="fu">,</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"target_file"</span><span class="fu">:</span> <span class="st">"/home/dawid/.config/tmux/themes/current-theme.conf"</span><span class="fu">,</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"tmux_config_file"</span><span class="fu">:</span> <span class="st">"/home/dawid/.config/tmux/tmux.conf"</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>Once that&rsquo;s done, restart the deaemon and switch your color scheme -
+it should trigger tmux to switch as well.</p>
 <h3 id="how">How?</h3>
-<p>As I stated before, the daemon listens on the DBus for all changes done to the color scheme preference. Whenever the preference changes, it executes the configured adapters with the new value. In case of tmux, it replaces the <code>current-theme.conf</code> symlink with the correct theme and executes <code>tmux source-file ~/.config/tmux/tmux.conf</code> which triggers it to reload the configuration in all its running sessions. Check the <a href="https://github.com/d1823/themer/blob/master/internal/adapter/adapter.go">source code of all the available adapters</a> if you&#x2019;re interested in the details.</p>
+<p>As I stated before, the daemon listens on the DBus for all changes
+done to the color scheme preference. Whenever the preference changes, it
+executes the configured adapters with the new value. In case of tmux, it
+replaces the <code>current-theme.conf</code> symlink with the correct
+theme and executes
+<code>tmux source-file ~/.config/tmux/tmux.conf</code> which triggers it
+to reload the configuration in all its running sessions. Check the <a href="https://github.com/d1823/themer/blob/master/internal/adapter/adapter.go">source
+code of all the available adapters</a> if you&rsquo;re interested in the
+details.</p>
 
     </div>
 </section>

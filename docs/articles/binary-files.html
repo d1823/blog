@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="d1823&#039;s programming ramblings">
+    <meta name="description" content="Creating a very basic binary file format.">
 
     <meta name="twitter:card" content="summary">
     <meta name="twitter:site" content="@_d1823">
-    <meta property="og:url" content="https://1823.pl/tags/utility">
-    <meta property="og:title" content="Articles for &quot;utility&quot; - d1823.pl">
-    <meta property="og:description" content="d1823&#039;s programming ramblings">
+    <meta property="og:url" content="https://1823.pl/articles/binary-files">
+    <meta property="og:title" content="Binary files, creating your own file format - d1823.pl">
+    <meta property="og:description" content="Creating a very basic binary file format.">
 
     <base href="https://1823.pl/">
 
-    <title>Articles for &quot;utility&quot; - d1823.pl</title>
+    <title>Binary files, creating your own file format - d1823.pl</title>
 
     <style>
         /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
@@ -1007,7 +1007,7 @@ code span.wa {
     <link
         href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TRZGKQzuoCGaoThZERRy1CkWoEGqFVh1MLv2CJg1Jiouj4Fpw8GOx6uDirKuDqyAIfoC4ujgpukiJ/0sKLWI8OO7Hu3uPu3eAUC8zzeoYBzTdNlOJuJjJropdrwhiAGEMIyQzy5iTpCR8x9c9Any9i/Es/3N/jl41ZzEgIBLPMsO0iTeIpzdtg/M+cYQVZZX4nHjMpAsSP3Jd8fiNc8FlgWdGzHRqnjhCLBbaWGljVjQ14iniqKrplC9kPFY5b3HWylXWvCd/YSinryxzneYQEljEEiSIUFBFCWXYiNGqk2IhRftxH/+g65fIpZCrBEaOBVSgQXb94H/wu1srPznhJYXiQOeL43yMAF27QKPmON/HjtM4AYLPwJXe8lfqwMwn6bWWFj0C+raBi+uWpuwBlztA/5Mhm7IrBWkK+TzwfkbflAXCt0DPmtdbcx+nD0CaukreAAeHwGiBstd93t3d3tu/Z5r9/QBS3nKamEF+kgAAAAZiS0dEAP0AcAA7rB2u5wAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAAd0SU1FB+cDGRUMGX8XZQgAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAC/0lEQVR42u3by2sTQRwH8O/MbJPYpm9bU6qJEm1BPbSCgiDqTWxFvGrFQ/8AsQcv/gFa8KQHqYgHwYuIePAgilI8ScG2qPVRsI0varQNTdMkbZKdGQ8VtbabrM86ye93HTbZ+ex35wXL5vrLNEq4OEq8CIAACIAACIAACIAACIAACKA0y/rvbmjLIMTqrcu2ZQd7oJMXKAEEQAAEQAAEQADFCqBliQPITJGtBEU7ROA4eN02sIomMKscYAw6l4LOxKFiQ1DRK9DZ218CMF88AGLNeYhwF1iZf0kb81aDeavBq0JAsBP2+HXIiW6wXLw4AKz1NyBCB1xKeWBt6gJWNUPNvoQwHUAE+tx3/vubWbsXMlpu9iDIPJ2wwod/A2+H2a8AD/UAlq/AVKeh0x+hs7OA8IBXBADhLYLzAL4ZVuP2/LPcpyHIsdPQ2VuLrwv1QgT3mQ3A67vzPn0ZHYA9untpg3oOO3IQWtyF1bzH3DGA1bQ5pz6Xhv3qZP50RE4BMmsuAPcHnTs3OQzIgQKrwEeQsWcGJ8BX55yA6UF3W4FkxFAAVr/siu9rx1LD7gDSY4YC8I0AY84dy7hLAHLTZgIwXpXnsSpAjbpLgG0ogLZH8ukA8Bf5gYj+kH8Ks9rcJcmqMXcW0Pac8x+V73T3I76QwQAZ5/eXVbe7S0Blq7kAasZ5CuMNLnZ5rAmiod3gBCScB0JeuQ4i0FfgEOUimNfgMUDFbwLKdu5gyzGI4DWA/xBzaxdE+I75u0HYDyGnnkI0OsSYCVgbDsEKdkClooCcB8oqFs4DmMBK1B8/EZJvLhU+2xce8KogeG0LuL95xTr/VwB0+jLku3u/dm0uBTn5xGwAALAjRyAnH/9kdHKwR85ARs4B0GYDAEnYL/ZDvr+/sA8oNHgm3iI7fAIqcRZ67ipUfNzQQXBRnmOwxzogJ46CN3WB17aC+erBhAdaZoDsLFTiNdTUA6hYL4DkN5BoP3hN+J8AMPpkpsSLAAiAAAiAAAiAAAiAAAigROszfw/sXyvnr2MAAAAASUVORK5CYII="
         rel="icon" type="image/x-icon">
-    <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Articles for &quot;utility&quot; - d1823.pl">
+    <link rel="alternate" type="application/rss+xml" href="feed.xml" title="Binary files, creating your own file format - d1823.pl">
 
     <!-- Matomo -->
     <script>
@@ -1038,7 +1038,7 @@ code span.wa {
     </a>
 
     <nav>
-        <a href="/" >Articles</a>
+        <a href="/" class="link--current">Articles</a>
         <a href="/about" >About</a>
         <a href="https://github.com/d1823">
             Projects
@@ -1047,22 +1047,118 @@ code span.wa {
     </nav>
 </header>
 
-<nav id="articles">
-            <h1 class="articles-header">Articles tagged "utility":</h1>
-    
-        <h2 class="article-link">
-        <span class="article-link__date">04/03/2024</span>
+<section class="page">
+    <div class="page__header">
+        <div class="header__meta"><a href="/">&laquo; back</a> &mdash; from 21/10/2012, tags:
+                                    <a href="tags/c">c</a>,                                     <a href="tags/c++">c++</a>,                                     <a href="tags/cpp">cpp</a>,                                     <a href="tags/good-old-times">good old times</a>                                    </div>        <h1 class="header__title">Binary files, creating your own file format</h1>
+    </div>
 
-        <a href="/articles/color-scheme-preference-in-unsupported-applications">
-            Enabling theme auto-switching in tmux        </a>
-    </h2>
-        <h2 class="article-link">
-        <span class="article-link__date">25/07/2023</span>
+    <div class="page__content">
+        
+<blockquote>
+<p>I&rsquo;m republishing this article to preserve memories&mdash;like keeping old
+photos.</p>
+<p>This content comes from some of my older blogs which I lost access to
+long ago, but are miraculously still online. Given their age (and how
+young &amp; inexperienced I was when I wrote them), these articles
+aren&rsquo;t meant to be learning resources, but more of a look back at my
+past work for myself.</p>
+</blockquote>
+<p><br> <em>At first, to understand this post, you have to know basic
+binary operations and a bit of C++ language. You do? Cool. Let&rsquo;s
+roll.</em></p>
+<h2 id="what">What?</h2>
+<p>That kind of file is not designed for being read by text-editors. Of
+course, there&rsquo;s no problem with it. A bit advanced editors would open
+binary file but believe me, you won&rsquo;t see anything useful. Not because
+it&rsquo;s encrypted or protected by some kind of password. It&rsquo;s just, they
+are nothing more than a sequence of bytes, written one by one, most of
+the time grouped in blocks. How they are grouped, well, that depends of
+the file format.</p>
+<h2 id="why">Why?</h2>
+<p>Mostly, because of it&rsquo;s efficiency. If you have a scheme of the file
+format, you can write an application that will read the file and get
+it&rsquo;s information. They are much lighter than their text represented
+alternatives. String occupy much more space in the memory than lean
+numbers, and the information you want to store is not always a text.
+Sometimes it&rsquo;s a content of an archive or an *.exe file. That kind of
+data was not meant to be read by people, but by machines, so it would be
+a big misunderstanding if we would even try to store that kind of
+information as a string.</p>
+<h2 id="how">How?</h2>
+<p>Well, there are two ways of creating your own file format. The first
+one is to grab some data and write a file with it, using a binary mode.
+It&rsquo;s fast, it&rsquo;s efficient, but at the same time, very chaotic and
+problematic. Reasons?</p>
+<ul>
+<li>If you have more of those files, how would you know that what you
+are trying to read is your file format?</li>
+<li>How will you distinguish different version of your file format?
+Application using older version may not be able to read your data
+properly, leading to major problems.</li>
+<li>Writing a binary data without proper informations describing your
+file format will mislead other applications, which may to lead to data
+corruption.</li>
+</ul>
+<p>The second way of creating a binary file format is to break your
+format into sections. The first one, should be file format header,
+containing unique signature and proper version of your file format. Such
+a simple action and it&rsquo;s solving all of the problems I mentioned before.
+File format signature prevents mistakes while loading wrong files.
+Version of your file format lets you control the different kinds of
+files you&rsquo;ll try to load into you application. Depending on kind of
+information you want to store, you&rsquo;ll have to create more sections
+containing important data.</p>
+<p>Example of an application writing and reading in binary mode.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;iostream&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;fstream&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> FHeader</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> signature<span class="op">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> version<span class="op">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> FData</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> number<span class="op">;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> sign<span class="op">;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">bool</span> state<span class="op">;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="kw">struct</span> FContainer</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    FHeader header<span class="op">;</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    FData data<span class="op">;</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">()</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    FContainer in_container<span class="op">;</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    FContainer of_container<span class="op">;</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    of_container<span class="op">.</span>header<span class="op">.</span>signature <span class="op">=</span> <span class="ch">'R'</span><span class="op">;</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    of_container<span class="op">.</span>header<span class="op">.</span>version <span class="op">=</span> <span class="bn">0x1</span><span class="op">;</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    of_container<span class="op">.</span>data<span class="op">.</span>number <span class="op">=</span> <span class="dv">5</span><span class="op">;</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    of_container<span class="op">.</span>data<span class="op">.</span>sign <span class="op">=</span> <span class="ch">'A'</span><span class="op">;</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    of_container<span class="op">.</span>data<span class="op">.</span>state <span class="op">=</span> <span class="kw">false</span><span class="op">;</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>ofstream output_stream<span class="op">(</span><span class="st">"file.bin"</span><span class="op">,</span> <span class="bu">std::</span>ios::binary<span class="op">);</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    output_stream<span class="op">.</span>write<span class="op">(</span><span class="kw">reinterpret_cast</span><span class="op">&lt;</span><span class="at">const</span> <span class="dt">char</span><span class="op">*&gt;(&amp;</span>of_container<span class="op">),</span> <span class="kw">sizeof</span><span class="op">(</span>of_container<span class="op">));</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    output_stream<span class="op">.</span>close<span class="op">();</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>ifstream input_stream<span class="op">(</span><span class="st">"file.bin"</span><span class="op">,</span> <span class="bu">std::</span>ios::binary<span class="op">);</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    input_stream<span class="op">.</span>read<span class="op">(</span><span class="kw">reinterpret_cast</span><span class="op">&lt;</span><span class="dt">char</span><span class="op">*&gt;(&amp;</span>in_container<span class="op">),</span> <span class="kw">sizeof</span><span class="op">(</span>in_container<span class="op">));</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    input_stream<span class="op">.</span>close<span class="op">();</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> in_container<span class="op">.</span>header<span class="op">.</span>signature <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> in_container<span class="op">.</span>header<span class="op">.</span>version <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> in_container<span class="op">.</span>data<span class="op">.</span>number <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> in_container<span class="op">.</span>data<span class="op">.</span>sign <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    <span class="bu">std::</span>cout <span class="op">&lt;&lt;</span> in_container<span class="op">.</span>data<span class="op">.</span>state <span class="op">&lt;&lt;</span> <span class="bu">std::</span>endl<span class="op">;</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 
-        <a href="/articles/routing-urls-in-multi-browser-environment">
-            Browser Matcher: HTTP(s) scheme handler        </a>
-    </h2>
-    </nav>
+    </div>
+</section>
 
 <footer>
     <div>
